@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Porciona</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="apple-mobile-web-app-title" content="Porciona">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#214D31">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="icon" type="image/png" href="../icono-192.png">
+<link rel="manifest" href="../manifest.webmanifest">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Mrs+Saint+Delafield&display=swap">
+<style>
+/* Layout: app de una columna para celular, pestañas fijas abajo; el plan llega en un código que pega la paciente */
+:root{
+  --bg:#F3EEF1; --card:#FBF9FA; --ink:#1F2B23; --muted:#5F6B62; --line:#E0D5DA;
+  --bosque:#214D31; --rosa:#EA9CAF; --orquidea:#D56989; --lima:#C2DC80; --salvia:#93B25A; --malva:#E4D6DD;
+  --title:#214D31; --tab:#FBF9FA; --field:#FFFFFF;
+  --serif:'Instrument Serif',Georgia,serif; --sans:'Instrument Sans','Helvetica Neue',Arial,sans-serif; --firma:'Mrs Saint Delafield',cursive;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141C17; --card:#1D2721; --ink:#EDE6EA; --muted:#A8B3AB; --line:#2F3B33;
+  --title:#C2DC80; --tab:#1D2721; --malva:#5A4A52; --field:#141C17; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141C17; --card:#1D2721; --ink:#EDE6EA; --muted:#A8B3AB; --line:#2F3B33;
+  --title:#C2DC80; --tab:#1D2721; --malva:#5A4A52; --field:#141C17; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.45;margin:0}
+.wrap{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 110px;display:flex;flex-direction:column;gap:18px}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+.firma{font-family:var(--firma);font-size:30px;color:var(--title);line-height:.9}
+.marca{font-family:var(--serif);font-size:34px;color:var(--title);line-height:.9}
+.marca em{color:var(--orquidea)}
+.rol{font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--title);font-weight:600}
+.hola{font-family:var(--serif);font-size:20px;color:var(--orquidea);white-space:nowrap}
+h1{font-family:var(--serif);font-weight:400;font-size:38px;line-height:1;margin:0;color:var(--title);text-wrap:balance}
+h1 em,h2 em{color:var(--orquidea)}
+h2{font-family:var(--serif);font-weight:400;font-size:26px;margin:0;color:var(--title);line-height:1.1}
+.sub{color:var(--muted);font-size:13px;margin:4px 0 0}
+.lbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.col{display:flex;flex-direction:column;gap:18px}
+/* fecha */
+.dia{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.dia button{background:var(--card);border:1px solid var(--line);color:var(--ink);width:40px;height:40px;border-radius:50%;font-size:18px;cursor:pointer}
+.dia button:disabled{opacity:.3;cursor:default}
+.dia .f{text-align:center}
+.dia .f b{display:block;font-family:var(--serif);font-weight:400;font-size:22px;color:var(--title)}
+/* resumen */
+.resumen{background:#214D31;color:#fff;border-radius:18px;padding:16px 18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.anillo{width:74px;height:74px;flex:none}
+.anillo text{font-family:var(--serif);font-size:22px;fill:#fff}
+.resumen p{margin:0;font-family:var(--serif);font-size:20px;line-height:1.15}
+.resumen small{display:block;font-family:var(--sans);font-size:12px;color:#C2DC80;letter-spacing:.08em;text-transform:uppercase;font-weight:600;margin-bottom:4px}
+/* grupos */
+.grupos{display:flex;flex-direction:column;gap:10px}
+.g{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.g-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.g-top h3{font-family:var(--serif);font-weight:400;font-size:21px;margin:0;color:var(--title)}
+.g-top span{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.g-top span.ok{color:var(--orquidea);font-weight:700}
+.dots{display:flex;flex-wrap:wrap;gap:8px}
+.dot{width:40px;height:40px;border-radius:50%;border:2px solid var(--c);background:transparent;cursor:pointer;padding:0;position:relative;transition:transform .15s}
+.dot.on{background:var(--c)}
+.dot.on::after{content:"";position:absolute;left:13px;top:8px;width:9px;height:16px;border:solid var(--k);border-width:0 3px 3px 0;transform:rotate(45deg)}
+.dot.half{border-radius:40px 0 0 40px;width:20px}
+.dot.half.on::after{left:5px;top:10px;width:6px;height:12px;border-width:0 2.5px 2.5px 0}
+.dot:active{transform:scale(.9)}
+.ejm{font-size:12px;color:var(--muted)}
+/* comidas */
+.comidas{display:flex;flex-direction:column}
+.cm{display:grid;grid-template-columns:54px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.cm:last-child{border-bottom:0}
+.cm .h{font-family:var(--serif);font-size:19px;color:var(--title);font-variant-numeric:tabular-nums}
+.cm h4{margin:0 0 4px;font-size:14px;font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--c);color:var(--k)}
+.caja{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+/* minuta */
+.semsel{display:flex;gap:6px;flex-wrap:wrap}
+.semsel button,.dsel button{font:inherit;font-weight:600;border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:999px;cursor:pointer}
+.semsel button{padding:8px 14px;font-size:13px}
+.semsel button.actual{border-color:var(--orquidea);color:var(--orquidea)}
+.semsel button[aria-pressed="true"],.dsel button[aria-pressed="true"]{background:#214D31;border-color:#214D31;color:#fff}
+.dsel{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.dsel button{padding:9px 0;font-size:12px;border-radius:12px}
+.dsel button.hoy{border-color:var(--orquidea);color:var(--orquidea)}
+.dsel button.hoy[aria-pressed="true"]{color:#fff}
+.mc{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.mc-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.mc-top h3{font-family:var(--serif);font-weight:400;font-size:21px;margin:0;color:var(--title)}
+.mc-top span{font-family:var(--serif);font-size:17px;color:var(--muted);font-variant-numeric:tabular-nums}
+.mc p{margin:0;font-size:14.5px;line-height:1.5}
+.comi{align-self:flex-start;font:inherit;font-size:13px;font-weight:700;border:1.5px solid var(--orquidea);color:var(--orquidea);background:transparent;border-radius:999px;padding:7px 14px;cursor:pointer}
+.comi.on{background:var(--orquidea);color:#fff}
+.dsel.c8,.semana.c8{grid-template-columns:repeat(4,1fr)}
+.cdset{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.cdset button{font:inherit;font-weight:600;font-size:13px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:10px 4px;cursor:pointer}
+.cdset button.d{background:#C2DC80;color:#214D31;border-color:#C2DC80}.cdset button.n{background:#214D31;color:#fff;border-color:#214D31}.cdset button.l{background:var(--rosa);color:#214D31;border-color:var(--rosa)}
+.turnohoy{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.turnohoy b{color:var(--title)}
+.tipm{font-size:13px;color:var(--muted);background:var(--card);border:1px dashed var(--line);border-radius:14px;padding:10px 14px;margin:0}
+.recetas{display:flex;flex-direction:column;gap:8px}
+.rct{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 16px}
+.rct summary{font-family:var(--serif);font-size:20px;color:var(--title);cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.rct summary::-webkit-details-marker{display:none}
+.rct summary small{font-family:var(--sans);font-size:12px;color:var(--muted);white-space:nowrap}
+.rct[open] summary{color:var(--orquidea)}
+.rct p{margin:8px 0 0;font-size:14.5px;line-height:1.5}
+/* semana entreno */
+.semana{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.sd{border-radius:12px;padding:8px 2px;text-align:center;cursor:pointer;border:2px solid transparent;font-family:var(--sans);display:flex;flex-direction:column;gap:2px;align-items:center}
+.sd span{font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:700}
+.sd b{font-family:var(--serif);font-weight:400;font-size:17px}
+.sd.fuerza{background:#214D31;color:#fff}.sd.cardio{background:var(--rosa);color:#214D31}.sd.descanso{background:var(--card);color:var(--muted);border:1px dashed var(--line)}
+.sd.sel{outline:3px solid var(--orquidea);outline-offset:2px}
+.sd i{width:8px;height:8px;border-radius:50%;background:transparent;border:1.5px solid currentColor}
+.sd i.hecho{background:#C2DC80;border-color:#C2DC80}
+.dia-h{display:flex;align-items:center;gap:12px}
+.letra{width:52px;height:52px;border-radius:50%;background:var(--lima);color:#214D31;font-family:var(--serif);font-style:italic;font-size:30px;display:flex;align-items:center;justify-content:center;flex:none}
+.ex{display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;padding:12px 0;border-bottom:1px solid var(--line);align-items:start}
+.ex:last-child{border-bottom:0}
+.chk{width:30px;height:30px;border-radius:9px;border:2px solid var(--title);background:transparent;cursor:pointer;position:relative;padding:0}
+.chk.on{background:var(--orquidea);border-color:var(--orquidea)}
+.chk.on::after{content:"";position:absolute;left:9px;top:4px;width:7px;height:13px;border:solid #fff;border-width:0 3px 3px 0;transform:rotate(45deg)}
+.ex b{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--title);display:block;line-height:1.1}
+.ex small{color:var(--muted);font-size:12px;display:block}
+.pres{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;align-items:center}
+.pres span{font-size:12px;font-weight:600;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:2px 8px;font-variant-numeric:tabular-nums}
+.pres label{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:4px}
+.pres input{width:62px;font:inherit;font-size:13px;padding:4px 6px;border-radius:8px;border:1px solid var(--line);background:var(--field);color:var(--ink)}
+.cardio-c{border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:6px}
+.cardio-c.m{background:var(--rosa);color:#214D31}.cardio-c.h{background:#214D31;color:#fff}
+.cardio-c ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:3px}
+.btn{font:inherit;font-weight:700;font-size:14px;border:0;border-radius:999px;padding:12px 18px;background:var(--orquidea);color:#fff;cursor:pointer}
+.btn.hecho{background:var(--lima);color:#214D31}
+.btn.sec{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+/* progreso */
+.barras{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;align-items:end;height:150px}
+.bc{display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
+.bc .b{width:100%;max-width:34px;border-radius:8px 8px 4px 4px;background:var(--lima);min-height:3px}
+.bc .b.hoy{background:var(--orquidea)}
+.bc span{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bc em{font-style:normal;font-size:11px;font-weight:700}
+/* guía */
+input.buscar{width:100%;font:inherit;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--field);color:var(--ink)}
+.al{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.al span:last-child{color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.gt{display:flex;align-items:center;gap:8px;margin-top:10px}
+.gt b{font-family:var(--serif);font-weight:400;font-size:21px;color:var(--title)}
+.gt i{width:12px;height:12px;border-radius:50%;background:var(--c)}
+/* carga de código */
+.carga{display:flex;flex-direction:column;gap:14px}
+.carga textarea{font:13px/1.4 ui-monospace,Menlo,Consolas,monospace;width:100%;min-height:130px;border-radius:14px;border:1px solid var(--line);background:var(--field);color:var(--ink);padding:12px}
+.err{color:#B23A48;font-size:13px;min-height:1em}
+.pasos{display:flex;flex-direction:column;gap:10px;margin:0;padding:0;list-style:none;counter-reset:p}
+.pasos li{display:grid;grid-template-columns:32px 1fr;gap:10px;align-items:start;font-size:14.5px}
+.pasos li::before{counter-increment:p;content:counter(p);width:32px;height:32px;border-radius:50%;background:var(--orquidea);color:#fff;font-family:var(--serif);font-size:19px;display:flex;align-items:center;justify-content:center}
+.link{background:none;border:0;font:inherit;font-size:13px;color:var(--muted);text-decoration:underline;cursor:pointer;padding:0}
+/* pestañas */
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--tab);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);z-index:5}
+nav button{background:none;border:0;font:inherit;font-size:11px;font-weight:600;color:var(--muted);padding:10px 2px 12px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
+nav button svg{width:22px;height:22px}
+nav button[aria-selected="true"]{color:var(--orquidea)}
+button:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid var(--orquidea);outline-offset:2px}
+.contacto{font-size:13px;color:var(--muted);text-align:center;margin:0}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div><div class="marca">Porci<em>ona</em></div><div class="rol">por Romina Valenzuela · nutricionista</div></div>
+    <span class="hola" id="hola"></span>
+  </header>
+  <main id="app"></main>
+  <p class="contacto" id="pie">¿Dudas? Escríbeme por WhatsApp · @nutricionista.rominavalenzuela</p>
+</div>
+
+<nav role="tablist" id="nav" hidden>
+  <button data-t="hoy" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg>Hoy</button>
+  <button data-t="minuta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Minuta</button>
+  <button data-t="entreno"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h2M19 12h2M6 8v8M18 8v8M9 10v4M15 10v4M9 12h6"/></svg>Entreno</button>
+  <button data-t="progreso"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20V12M12 20V5M19 20v-9"/></svg>Mi semana</button>
+  <button data-t="guia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5" stroke-linecap="round"/></svg>Porciones</button>
+</nav>
+
+<script>
+/* ===================== Grupos y guía de porciones (de la guía de Romina) ===================== */
+const GRUPOS={
+  cereales:{nombre:"Cereales",c:"#C2DC80",k:"#214D31",ej:"½ marraqueta o ¾ taza de arroz cocido"},
+  proteinas:{nombre:"Proteínas",c:"#D56989",k:"#FFFFFF",ej:"½ palma de pechuga de pollo (50 g) o 1 huevo"},
+  frutas:{nombre:"Frutas",c:"#EA9CAF",k:"#214D31",ej:"1 manzana o 1 taza de frambuesas"},
+  verduras:{nombre:"Verduras",c:"#3A6B4A",k:"#FFFFFF",ej:"1 taza de brócoli cocido o 1 tomate"},
+  lacteos:{nombre:"Lácteos",c:"#E4D6DD",k:"#214D31",ej:"1 vaso de leche descremada o ½ yogurt protein"},
+  grasas:{nombre:"Grasas",c:"#93B25A",k:"#FFFFFF",ej:"15 almendras o 4 cucharaditas de aceite de oliva"}
+};
+const ORDEN=["cereales","proteinas","frutas","verduras","lacteos","grasas"];
+const G=s=>s.split("|").map(x=>x.split("~"));
+const GUIA={
+ cereales:G("Pan marraqueta~½ unidad|Pan hallulla~½ unidad|Pan masa madre~1 rebanada|Pan de molde integral~2 rebanadas|Pan de molde blanco~3 rebanadas|Pan pita~1½ unidad|Pan ciabatta~½ unidad|Pan baguette~⅛ unidad|Pan Hi Low~3 rebanadas|Tortilla S~2 unidades|Tortilla M~1 unidad|Arroz blanco (cocido)~¾ taza|Arroz integral (cocido)~¾ taza|Camote~½ unidad|Papa~1 unidad|Choclo~1 taza|Cous cous~1 taza|Mijo~¾ taza|Pasta blanca (cocida)~¾ taza|Pasta integral (cocida)~¾ taza|Plátano verde~1 unidad|Pastelera~½ taza|Quínoa (cocida)~1 taza|Cabritas~3 tazas|Avena instantánea~½ taza|Granola~½ taza|Granola proteica~½ taza|Cereal En Línea~1 taza|Cereal Vivo~¾ taza|Cereal Chocapic S.A.~1 taza|Cereal Fitness~¾ taza|Muesli~½ taza|Quínoa pop S.A.~½ taza|Galletas de soda~6 unidades|Galletas de arroz~6 unidades|Galletas Salma~6 unidades|Galletas de salvado~6 unidades|Galletas Crackelet~12 unidades|Galletas azucaradas~3 unidades|Barra Soul Bar~1 unidad|Barra Mizos~1 unidad|Barra Quaker~2 unidades|Barra En Línea~2 unidades|Galleta Mizos chocolate~2 paquetes|Bulgur~¼ taza|Mote~¼ taza|Harina de arroz~⅓ taza|Harina de avena~⅓ taza|Harina blanca~⅓ taza|Harina integral~⅓ taza|Harina de quínoa~⅓ taza|Harina de garbanzos~⅓ taza|Polenta~⅓ taza|Sémola~⅓ taza|Maicena~2 cucharaditas|Papel de arroz~4 unidades"),
+ proteinas:G("Clara de huevo~3 claras|Huevo entero~1 unidad|Huevo de codorniz~4 unidades|Albacora~½ palma|Almejas~6 unidades|Atún filete~½ palma|Atún en lata~½ lata|Blanquillo~½ palma|Tilapia~½ palma|Caballa~½ palma|Jurel~½ palma|Calamar~½ taza|Camarones~½ taza|Centolla~½ taza|Choritos~1 lata|Congrio~½ palma|Jaiba~½ taza|Kanikama~½ taza|Locos~2 unidades|Machas~½ taza|Reineta / merluza~½ palma|Ostras~½ taza|Ostiones~½ taza|Pulpo~½ taza|Salmón~½ palma|Carpaccio de salmón~5 rebanadas|Trucha~½ palma|Carne molida de pavo~½ palma|Filete de pollo~½ palma|Pechuga de pollo~½ palma|Pechuga de pavo~½ palma|Trutro de pollo~½ palma|Asiento~½ palma|Posta negra / rosada~½ palma|Pollo ganso~½ palma|Lomo liso~½ palma|Punta picana~½ palma|Filete de vacuno~½ palma|Plateada~½ palma|Tapapecho~½ palma|Tártaro 3%~½ palma|Lomo de cerdo~½ palma|Solomillo~½ palma|Carne de soya~3 cucharadas|Edamame~1 taza|Seitán~⅓ taza|Tofu~½ taza|Salchichas Riku~1 unidad|Hamburguesa NotCo~1 unidad|Arvejas~¾ taza|Garbanzos~¾ taza|Hummus~¾ taza|Lentejas~¾ taza|Porotos negros / rojos~¾ taza|Porotos burro~¾ taza"),
+ frutas:G("Arándanos~1 taza|Caqui~1 unidad|Castañas~3 unidades|Cerezas~15 unidades|Chirimoya~¼ unidad|Ciruela~3 unidades|Clementinas~3 unidades|Damascos~3 unidades|Duraznos~1 unidad|Frambuesas~1 taza|Frutillas~15 unidades|Granada~½ unidad|Higo~2 unidades|Kiwi~2 unidades|Lúcuma~¼ taza|Mandarinas~3 unidades|Mango~½ taza|Manzana~1 unidad|Maracuyá~¼ taza|Melón tuna~¾ taza|Melón calameño~1 taza|Membrillo~1 unidad|Mora~1 taza|Naranja~1 unidad|Níspero~4 unidades|Papaya~1 unidad|Pepino dulce~2 unidades|Pera~1 unidad|Plátano~½ unidad|Pomelo~½ unidad|Sandía~1 taza|Tuna~2 unidades|Uvas~10 unidades|Cranberries~12 unidades|Damasco turco~3 unidades|Pasas~12 unidades|Goji~3 cucharadas|Dátiles~3 unidades|Pulpa de fruta~½ taza|Paleta de helado pura fruta~1 paleta|Yoguen Fruit~1 vaso|Paleta Guallarauco~1 paleta"),
+ verduras:G("Alcachofa~1 unidad|Berenjena~½ unidad|Betarraga~½ taza|Brócoli (cocido)~1 taza|Cebolla cocida~¼ taza|Cebolla cruda~¾ taza|Champiñones cocidos~½ taza|Champiñones crudos~1½ taza|Choclitos cocktail~½ taza|Coles de Bruselas~¾ taza|Coliflor~¾ taza|Espárragos~5 unidades|Palmitos~2 unidades|Pepinillos~9 unidades|Porotos verdes~½ taza|Zanahoria cocida~⅓ taza|Zanahoria cruda~½ taza|Zapallo~½ taza|Tomate~1 unidad|Tomate cherry~1 taza|Salsa de tomate natural~½ taza|Acelga, achicoria, apio, berros, brotes, cochayuyo, endivia, espinaca, kale, lechuga, pepino, pimentón, rabanito, repollo, rúcula, zapallo italiano~Consumo libre"),
+ lacteos:G("Leche descremada~1 vaso|Leche cultivada light~1 vaso|Leche semidescremada~1 vaso|Leche 50% protein Loncoleche~½ vaso (100 ml)|Protein Shot Loncoleche~1 unidad|Yogurt Protein Loncoleche~½ unidad|Yogurt descremado~1 unidad|Yogurt natural~1 unidad|Quesillo Protein Quillayes~2 rebanadas|Queso light Colún~1½ rebanada|Queso Protein Loncoleche~2 láminas|Queso crema light Santa Rosa~2 cucharadas|Queso fresco light~2 rebanadas|Ricotta light~2 rebanadas|Bebida de almendras~1 vaso|Bebida de arroz~1 vaso|Bebida de avellanas~1 vaso|Bebida de coco~1 vaso|Bebida de soya~1 vaso|NotMilk~1 vaso|Yogurt de soya Loncoleche~1 vaso"),
+ grasas:G("Aceite de oliva~4 cucharaditas|Aceite de canola~4 cucharaditas|Aceite vegetal~4 cucharaditas|Aceite de coco~2 cucharaditas|Aceite de pepita de uva~4 cucharaditas|Aceite de sésamo~4 cucharaditas|Aceite de maíz~4 cucharaditas|Palta~½ unidad|Aceitunas~15 a 30 unidades|Coco~2 cucharadas|NotMayo~2½ cucharadas|Mayonesa Kraft~2½ cucharadas|Chocolate 70% cacao~3 cuadritos|Almendras~15 unidades|Avellanas~15 unidades|Castañas de cajú~12 unidades|Maní~30 unidades|Nuez mariposa~10 unidades|Pistachos~15 unidades|Mantequilla de maní~2 cucharaditas|Harina de coco~2 cucharadas|Harina de linaza~2 cucharadas|Harina de almendras~2 cucharadas|Amapola~2 cucharadas|Chía~2 cucharadas|Linaza~2 cucharadas|Maravilla~2 cucharadas|Semillas de zapallo~2 cucharadas|Sésamo~2 cucharadas|Tahini~2 cucharadas|Queso de cabra~2 rebanadas|Queso gouda~2 rebanadas|Queso mantecoso~2 rebanadas|Queso ranco~2 rebanadas")
+};
+
+/* ===================== Cardio (plantillas) ===================== */
+const CARDIO={
+  moderado:{t:"Cardio moderado",cls:"m",txt:"Esfuerzo 5–6 de 10: puedes hablar en frases cortas.",it:m=>["5 min de entrada suave",`${Math.max(5,m-10)} min a ritmo constante: caminata rápida en pendiente, bicicleta o elíptica`,"5 min de vuelta a la calma"]},
+  hiit:{t:"HIIT",cls:"h",txt:"Tramos intensos (8–9 de 10) con pausas para recuperar.",it:m=>["5 min de calentamiento",`${Math.max(4,Math.round((m-10)/2))} rondas: 30 s intenso + 90 s suave`,"5 min de vuelta a la calma"]},
+  pendiente:{t:"Caminadora con inclinación",cls:"m",txt:"Esfuerzo 5–6 de 10: respiras más rápido pero puedes hablar en frases cortas. Sin correr.",it:m=>["5 min de calentamiento: 0–2 % de inclinación, paso cómodo",`${Math.max(5,m-10)} min con inclinación de 6 a 10 % a paso firme (4,5–5,5 km/h). Sube 1 % cada semana`,"5 min de vuelta a la calma: baja la inclinación y la velocidad","Sin afirmarte de las barandas: brazos libres y espalda derecha"]},
+  intervalos:{t:"Intervalos en pendiente",cls:"h",txt:"Alternas subidas exigentes (7–8 de 10) con tramos suaves. Sin correr.",it:m=>["5 min de calentamiento en plano",`${Math.max(3,Math.round((m-10)/4))} rondas: 2 min con inclinación de 10 a 12 % + 2 min con inclinación de 2 %`,"5 min de vuelta a la calma"]},
+  caminata:{t:"Caminata",cls:"m",txt:"Paso firme, que te cueste un poco conversar.",it:m=>[`${m} min de caminata`,`Si no tienes tiempo seguido, divídela en 2 de ${Math.round(m/2)} min`]}
+};
+const ETQ={moderado:"Cardio",hiit:"HIIT",caminata:"Camina",pendiente:"Caminadora",intervalos:"Subidas"};
+
+/* ===================== Plan de ejemplo ===================== */
+function sesionHtml(s,k,hecho){
+  let h="";
+  if(s[0]==="f"&&PLAN.r&&PLAN.r[s[1]]){
+    const R=PLAN.r[s[1]], ex=S.entreno[k+"-ex"]||[];
+    h+=`<div class="dia-h"><span class="letra">${s[1]}</span><div><span class="lbl">Día ${s[1]}</span><h2>${R[0]||"Fuerza"}</h2><span class="sub">${R[1]||""}</span></div></div><div class="caja" style="padding-block:4px">`;
+    R[2].forEach((x,i)=>{const pk=s[1]+"-"+i;
+      h+=`<div class="ex"><button class="chk${ex[i]?" on":""}" data-ex="${i}" data-k="${k}" aria-label="Marcar ${x[0]}" aria-pressed="${!!ex[i]}"></button>
+      <div><b>${x[0]}</b>${x[4]?`<small>${x[4]}</small>`:""}<div class="pres">${x[1]?`<span>${x[1]} series</span>`:""}${x[2]?`<span>${x[2]} reps</span>`:""}${x[3]?`<span>pausa ${x[3]}</span>`:""}
+      <label for="p-${pk}">Peso <input id="p-${pk}" inputmode="decimal" data-p="${pk}" value="${S.pesos[pk]||""}" placeholder="kg"></label></div></div></div>`;});
+    h+=`</div>`;
+  }else if(s[0]==="c"){
+    const c=CARDIO[s[1]]||CARDIO.moderado, m=+s[2]||30;
+    h+=`<div class="cardio-c ${c.cls}"><span class="lbl" style="color:inherit">${m} min</span><h2 style="color:inherit">${c.t}</h2><p style="margin:0">${c.txt}</p><ol>${c.it(m).map(i=>`<li>${i}</li>`).join("")}</ol></div>`;
+  }else{
+    h+=`<div class="caja"><h2>Día <em>libre</em></h2><p class="sub">${esc(s[1]||"Descansar también es parte del plan. Una caminata suave suma.")}</p></div>`;
+  }
+  if(sesion(s)) h+=`<button class="btn${hecho?" hecho":""}" id="fin" data-k="${k}">${hecho?"✓ Sesión completada":"Marcar sesión como completada"}</button>`;
+  return h;
+}
+function vistaEntrenoCiclo(){
+  const C=CD(), sc=PLAN.sc, I=cdInfo(new Date());
+  let h=`<div><h1>Tu ciclo <em>de entrenamiento</em></h1><p class="sub">Se acomoda a tus turnos: toca un día para ver qué te toca.</p></div>`;
+  if(!I) return h+`<p class="tipm">Cuéntame una sola vez: ¿qué día de tu turno es hoy?</p>${cdSel()}`;
+  if(diaSel>=C.k.length) diaSel=I.dia;
+  const ini=new Date();ini.setHours(0,0,0,0);ini.setDate(ini.getDate()-I.dia);
+  h+=`<div class="semana c8">`;
+  sc.forEach((s,i)=>{const d=new Date(ini);d.setDate(ini.getDate()+i);const hecho=S.entreno[fk(d)];
+    const cls=s[0]==="f"?"fuerza":s[0]==="c"?"cardio":"descanso", tit=s[0]==="f"?s[1]:s[0]==="c"?(ETQ[s[1]]||"Cardio"):"Libre";
+    h+=`<button class="sd ${cls}${i===diaSel?" sel":""}" data-sd="${i}"><span>${esc(C.n[i])}${i===I.dia?" · hoy":""}</span><b>${tit}</b>${sesion(s)?`<i class="${hecho?"hecho":""}"></i>`:""}</button>`;});
+  h+="</div>";
+  const s=sc[diaSel]||["d"], d=new Date(ini);d.setDate(ini.getDate()+diaSel);
+  return h+sesionHtml(s,fk(d),S.entreno[fk(d)]);
+}
+
+const DEMO={v:1,n:"Ejemplo",p:{cereales:4,proteinas:6,frutas:2,verduras:3,lacteos:2,grasas:2},
+ d:[["Desayuno","08:00",{cereales:1,proteinas:1,lacteos:1}],["Colación 1","11:00",{frutas:1,grasas:1}],["Almuerzo","14:00",{cereales:2,proteinas:3,verduras:2}],["Colación 2","17:00",{lacteos:1,frutas:1}],["Cena / once","20:30",{cereales:1,proteinas:2,verduras:1,grasas:1}]],
+ s:[["f","A"],["c","moderado",30],["f","B"],["d"],["f","C"],["c","hiit",25],["d"]],
+ r:{A:["Tren inferior","Glúteos y piernas",[["Sentadilla goblet","4","10–12","90 s","Mancuerna pegada al pecho, baja controlado"],["Peso muerto rumano","4","10","90 s","Espalda neutra, cadera atrás"],["Hip thrust","3","12","60 s","Aprieta glúteos 1 s arriba"],["Zancada atrás","3","10 c/pierna","60 s","Rodilla delantera sobre el tobillo"]]],
+    B:["Tren superior","Espalda, pecho y brazos",[["Remo con mancuerna","4","10–12","90 s","Codo pegado al cuerpo"],["Press de pecho","4","10","90 s","En banco o suelo"],["Jalón al pecho","3","12","60 s","Hombros abajo y atrás"],["Plancha","3","30–40 s","45 s","Abdomen firme, cadera alineada"]]],
+    C:["Cuerpo completo","Fuerza general",[["Sentadilla búlgara","3","10 c/pierna","60 s","Pie trasero en banco"],["Remo invertido","3","10","60 s","Cuerpo recto como tabla"],["Puente de glúteo a 1 pierna","3","12 c/pierna","45 s","Cadera nivelada"],["Dead bug","3","10 c/lado","45 s","Zona lumbar pegada al suelo"]]]}};
+
+/* ===================== Código del plan ===================== */
+function unb64(s){s=s.replace(/-/g,"+").replace(/_/g,"/");while(s.length%4)s+="=";const bin=atob(s),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return u}
+async function decodificar(txt){
+  const m=String(txt).replace(/\s+/g,"").match(/RV([01])-([A-Za-z0-9_-]+)/);
+  if(!m) throw new Error("formato");
+  let bytes=unb64(m[2]);
+  if(m[1]==="1"){
+    if(!window.DecompressionStream) throw new Error("navegador");
+    const ds=new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+    bytes=new Uint8Array(await new Response(ds).arrayBuffer());
+  }
+  const o=JSON.parse(new TextDecoder().decode(bytes));
+  if(!o||!o.p||!o.d) throw new Error("formato");
+  return o;
+}
+
+/* ===================== Estado ===================== */
+/* PLAN_PACIENTE: Claude reemplaza null por el plan de cada paciente (sale del JSON de la calculadora, clave "app").
+   Opcional: m = minuta propia [semana][día lun→dom][comida en el orden de d] (texto), mi = "AAAA-MM-DD" lunes en que parte la semana 1,
+   rec = recetas [[nombre, tiempo, texto]]. Sin m, la app arma una minuta automática de 2 semanas. */
+const PLAN_FIJO=null;
+/* PLAN_CIFRADO: plan cifrado con la clave de la paciente (AES-GCM + PBKDF2). Lo genera armar_paciente.mjs */
+const PLAN_CIFRADO={"id":"jennifer-oisd","it":600000,"s":"IDTom6939EZ57F9XdIe_3A","i":"IHi_mwnCMZ2zz-iB","c":"xQw7YN8OZ24pBGeDJZ1m0Fmw_EOlnmtbPVZx9jp8NxNW1IFkytEUQLGj-J07BxVwsifHcUB1v2JpHwapGQuGCtdk-4OqA82c6qk2ovLLDJt4Z5I9DtcurUH486M-O-TIrplcts7aUJ-lGLZdy6XlxcSF5SonjoPCC7v35scFxK-uM0NjyAc9KUEb4Rn_aEERU45KbdtV2oUA5IgdWae-9GaO54WjbqG5sZBAY3DPKvGqyhYZi9gQ9DldUdthTvRwL79JWURkJuF2gOhekAMnyQXfWDgdQ4vjAyoYLKOO4qUEscwOROe5CeF4vFrvy77pcHIh02Ujq7eNJu1w0bYbfRYg4oVwUsd9YnG1cHzMF99BU0DsEvNL3qg4mhjwznIOwUjcRYkO5BaVaEW5kQsODXeDk6wnbDJczSay8ivQ_leAa69TVcJMPNaf4q_hG3tZBJe3VBz5JAwT2yr2DaNt5wciWnLRdXclWTEh2-0vMJVmaNQX5_2ifWMDvjzW8rO-epvVRLVlhcyB71IPXd1LRqvCYrNHrMuPcqsMYyqDb7imxCfqibAEMck8RZjGOeBx6RX6dVAG29x32AbYkc4nfz-alb5h9-zWNR6GxXGu1p2RHEX_SiEH8zc4cCRgq19qOT2EJq-oPJ_6SryvR11hBuxstNY02g2ot4SOwjgOMczSWhVZnDEFbu8kCgwcTnJgcwUVJqR64PDnHmFf5LiwXkgZgrIsY_u6GCchO7AOsvZ6GVsZaChDCofTae5TqF8cW8CH7-i_8iIOMeWXupv6aHIa1OjaCIZ1Nt_JmcQ_D59JuCu7VLFzB72TFG7qesmayuebrNQNaDdjXwTy-q3BRDSCedH73Ims6ANI047QKE3HuHPt5mNrpmKLa5BE0UVkvjb89Q-G9KuIN6lnZDeOiVNYYPZtk2rPkiq4K7cOxgS5g5L6Lg_sGzqFNGJov9YrnQQIpKjEaeLj2_gEGkvh8_Apo5RQsyDIHX0afKt1ZU_73fOwA7GhZNiOyAdqSfkZnEeJ2OdwWgKBrooV5Mzq8Qe7eA3bCPBUZnFy9bK_Up54gT4eolZfiKAkq_0KF7y_LzYQ1UdcLKgXHshhgk8R2nEAsj2f4IQGyONiX4LMQdu1vH7O0dBfVOnTnCAXjZQN7vrDiihmVS021H2OQUvwYTelo93Smx7TwzYNfOKnrlNkZgCfp2hclRvs7frYvTMmsI14Yt1vIlGC5U2OlNQ3HQK1ZHuk5wgapSIBgWW_phsx_xY-PPh0aaNsV3vgUzecgYoWKmMb37nkVFnowWlE6xT3n0lxlvWtHlAX7j1gwe5hcxr_FUrIgfW9e7RtO1GH_GETa3OEK0sn5AdxoGI61_p6TvkvjEBh7CRIAVN7OqladeU_70X-VLGlb6gnWF8yge2d_mVj9u1cLgBa474P-nr9589hirP3-b9kwjPKM7smfqaLEC8lkEt0TCPNSFX6tRyy2cUWztDtMtcX_u9gGFQIaNRwFoJM6lItey6O-Zsexd9H1d6rtMKay7Y0bCz49wUPoHnf812l1109BGgdPAa9CFSoSzJ0nJcB1m_u11wC39EMHZjRfwGBZtufwGZ8y6FVBSD8SGJsFNq7lE8ePbCDZ4ni_c3SbI6F_rn62ZCqOJqBF6auVE7d_axtMZ_VXE1wXwYkT7oZtUT0tGu2goA48gZPdhuKyEGUxtHUHu0cI8FBfTkfdMztIIynfNp5NdOVeTMDjmjrtqZd_D0dSMBRTX7I7rdW_eA4kMTI2w8KU-omcZr4N7KyQS8Oa5ZL8BqHARts1URiDs-er-6QUiWQgf2ueAEJRy9xkCkWqzSFx3vriQbF7MMOKe13vK78c7iyLppx_vXlqS7tu2KkBk4UXCC2zfOG_KW7LPZfaRkBP3O0c8wctMKu93L2nZcWYBhgsq34sCELeCpx_z3qzq-cE-YP8w4kgvXyg8Wfv44ttc9LCvfZiLI7n1i3NHPR0dplLFVVd8nONmNtk-Vju-ZstTGywwYGbifl8Jvuxm2j2aUuyW9ycPF6IVbCF1GNkzTrfB45-7NdZMAgPa1TfBrwCKEenlf_v-Msbe2w2qIlt3OCTN3MO-r3pmAiCcC3TIlNw-RyqljQf6gCKPcZUzMv94Gx5qTriR5yjyUOfKxhTl7Lk_-1cBDdGQ8b5vN_zr1OFJrPzN4X07SUQb7PEUC8oHvpqS05gwd6Eo8t-0TO3lQ5VhyDB9B5t59nMgB2sdEqI5JUtmbTHgcXwvHTedO13sHGhQ78CLIGAJY_UxgsPzYdBG6cA5pMnHZXmpmqgiuLadg4A4V_dRXjxeL7CV5-uF6odGDNuoiw72Vv2w-Vu7T8BZDxiM7AV60bsfynj6nTVT4cy4WBMXKob6c9rrsqnnlUugUC8H00QNBETVE7NKFm8DDRN1-icFR-d2u5l5T2x6Sz-R18q4Uf8ghid6HyslophjfhSVKJy93FOugnGvRl8x9dwwIy6sZ6uhSefpM59a_65IWVGaFCV2n-fYhmSC4fGtYqUHxx-sSFWlD__2EtWY0J11FHbx69E040_i0tWT3_8Z2zoGKIPEhsSXV3ia8mKOX-y7s_WOhbqc5S1O7h0fSC7zft7ZYOqe0akbSS1tTiHzfW_14bu9cyoq4klSJKJcVVQ_fOjm6P7O46BvSkIHQkZtgeqj-RIB8pN2vpfOnLOjAF1uez5Xt7YIylfZLckz3Zl1dNLDB9xDTZY4pLOGE-JYtk2RaPA_3rDW_E5zgbgoKTNGRHXwXxkC8c2wMu7FE9Vw-kjpfRQOuCI56MAeivOoCyBuE-BfJZlGQd89U1aOek2tj43TH9veMmq1HpEFsBbqdydLVFGH3pocFXdSXVk7BXhxiF0vOg-F3-tMOjsts0hmT9Arc14INIyeayiXOf21Mui_XTJyTVDJos2nEZ1Nrf1r3dIA1I50U9Ok-Mu1U8KXdmt6ztVqqq82GDN7qLEgCs_0g9eREWW3TEyhGM_CNLFUsZcTlLfJP-uF-R3xd8LHi2vNq5My5tR-WJh5RtNYi0qN8RJPM7nxf1d5Ww_S_scC4jILMlO0SZYTI2_eBNlBWZjp5hpUvPJREgEuN2Xi9HWu2zfo1AX7ddVRrtIoV33rgsxs21Tmxz_iQxW0SuTpIBGs_OESHcZHw5L-gImkavTqz1cgBiNjh66hBQObrC-My5FbTC14TFUlapWDuRB5JaSAPR0Y0Eqn1uji9HitWb5bSzP575oD0gSvXrsrNG1slJ38zWmIZ-Fl3o_Idpn3wfIsqoaWigwiwVXAEAoZSUmnvW4s3Gh0EiQrWMiwhxTUMdUFzYfGw2qMeJ93UiZqkEZXIdP9HNBv58waLN_xvxylcTf5rR3w2aMJeniHOu0p6lB-jI-uFaH-A5W2GDBJyhCIzyoYyneqRvxB5AMmW1JXTn5VX_oo8prVmPNVUJ-TBhon3MzwUNUSjHg6JRZHVrlj1oSvowWTOcz0okSqpq-W_xLe5wrvh0vUgyddLtxHDJt16BRfgdjmR5bSUv5rkS9JN7Z0pfPqS6HiE39m-2-e-I5kznH2QFkUqQrK06Z9e6n7dqjrlKTgVi5egYsInwjXwKtaeZdjdngZffRrFjpxOcJtYXp6J4XW5_iLNW8iPZRJkTTJUsgrmaI306nA2HMCMtrIZlxMfm4UU_36tCqUL6IJnmxIwF14wxpIRmdC3K07jzklT1iKuPja-I1IeihcbCd49Qunc6qqTSRn4Yr7K1rtVWA58cZLOC79MKV8ScRA5LEyQk_ahjeKQ1_QTZSegxmYjouk0-Mx-UgorNV4DcSeF1-r7b5qHbQUjkXNgED9fQ2c2_G61AOSHe2SBmwlnQEmMac1e1l6S15WyIbUEsAXjYghUVSMEdBDGvOEC3Q4-M508oQ3fW9frsnZDk7M5j9fQC6U6EGjIPTH67EGeR8WZYj9acgP97myDdmn3yZjWL8nDQzpFFw85z7pPf6Io9qKjNokRpsufiU8e8A0RAT811WcrpJN6fw05mC59clwsENQVQDOgnWD3fQa_64H1LBorSFsi3M6S3yUB1lCkaYs_lI6zAonhluHa-XMAExlNu8--tJCPJQBHNHOGXuE4XncI_8ry2DR4R9HJDHRIwIRNO06OsXaTimplncfy44Ef1VD67lfFHf6nxfzAzc-5EmB--5X0hHhFE1Utq75w8A9Oe9L7Ja6PYHIyb268nzc9bkMJn7v78IfV5uUXqBH0-zniFfs6lTP1wIDpVD04btfFfABhi4sjWlYM3eqMEr-t8aPorAPvJ4O7UN8o_uD915IhtiQDptItlNUbQavh-Pu7ffyxlYPK-Nl23nxZUwbdGBECrsZITFM2OgkpH1Gv7XPstWv5G_sIoHmcSOCd4l1-rQb-ELiY9e-napK0X8KEHFF9ZmcjZohcDRi6wBU8H90UGWNMr2LA4tbEH-EwmemEMr6WojO6tyTXgvwCOIcu3B3SBpL-YYjh4NxSOKqSDOEiBCzV8npg0vpa6Fybz3G-DpafKf9_GZgW5P07zJ34h2lYAS_5M8aCQwF5y_8XWUZgMDnmQvFn4X9bpi6NBH24Mlm_dqJmvKeagwVhVgV5-01nakR3jfQrVaiCoiefhLJ0OepcP8VM892xuZYrNpTwbAKdbGPrAoz82vJ0P41ie7apkOFd1aU7v_f1czfjshKf_aOJNgTnTLM42WnQtKo21lhyQktkZdRNrLj2xlleABtCNIZER5LppY8DQwJPiLwUm11uFPdcv2o2oOzyop8CicjkdZhHKM3q2ygW9F_Ztf3H-9088JPUOGDMWz67epsMEn90PnIYHT5PyMwhFF_-C0dO8fSZaE6vEN0r0yFdARSZGBg2_n-f9yxc9CM1P08XxdBVFCHclR7qprkEBvp0NmujVlfvivrSeQxXGhwzNZtBmFeK-zYoEF738roAMwJFPu0I3VFBNfEbs0c6jv_4Ap9CSc-FroXO6gHG9-6KZoACC2CemA0rL4SEPNdL7Sm8Jxxn2nHCO2pcGT095jv2naKOfiKnCJA4Oi29QGmW3MOyKwXpAUCpylYtFG3vXXFyB46pX3qb8t4JACz69-ErTxk7hvOKSI63ndabWA-DhrOQchhDZfeXcyr3ma1rqsGS0XcnYr214COwTeNio2621ExDXq0sXdovoQWk4BRObX2aviZyqnRGiiditDP1xTERmg-zcxjr7eKAAKccMwsl_9OY09eDBgAaRC0h7FNTBJ07fL3ztCTwSHVkSgD9rKghhabWGxWaQLWD9UDjZvcigII0KmO9ci23W8VDzMVVYFMdALBnvzfn_-e10ML9qIMo6sLKxHCqZ8zX_U03uQAPqTNcoZZLhUgjElXTfYN70qVVh43roGkLpb7UZCIRq_AXkB0WkVerCgxQI4CO8qKQ8KO_o8iW0-jTJGo4gdiD-Aj9RZCuWpXt---jjJZEgAYXJVPtYiKY0GNFUBIuk0wvAGhsOi91XkkrK26ODnBy56fMhh08L_SBLJ3Bmcs74m07YbCcs1vSmCvCXPHEdIE9wsRoY_m8f0btr5mwX59Nszwz3sMOLgdyCZT96p2_rPdSPEfXw77Nvd02wr7j0dcKAFCAF5SBb8FV8FMxMLZND1REuwFDT3LugsYZ1xred_oOu2EGzNyNn9Wps3qX1qaRfDAHnS18SX6Odbhk_Pg9jnPyKd1Ltkugf1s5Q2roHAldsFQbujNc-rXt_Pd2pkTCTvYeFUXOK_b_AxDVv64oimwOJKYkQGJL0m54UlaHF8rYpyjYifV4j0cwz4iqCGpctOcMTclKEx0X03iBNri70ZkRtl70r7SwvRnsLM3ooOlSiS4F2C7SY8gDhndwzFjdvclB9rqTrV_V9U4vOi_6FVfgFmeNqrmBSBlMbbEMTyv9WFTphytOGlpvu_wZ08OEVFTOEgF5_jGrS5Xe9K6plI7cajpIxNdeRjgHHqAKzo9lfJooaiyXpMd5uA9f6A9_Ictou6WNvIYNKnwaSnpmczESs_NVoCDZ7A1nN0QLoOf5ZFxM37IjmksWs92aX7zp9oPG1_h9skgAL_LEif8QtaxHo9KP1zt_vkPjVnx4-dpK4sjvi11w67JxFM6RRnizUykLjB4-bHQPEdPbQfYiP1N1b345gGs6zUD_0uc5wQWvvcJyJxJOsLldj7037qlcdw4L8FGqxBLI2_tiGXhLDV5phYn19I9cTDfHTnfIR0V9GC1ouMmOTkFfsWljeItoUDtxuQb6bkoGC6oMksLXXWfsLWSCeTKiECB8y32sEvH_NFapj2Ri1Qkq8GKCGefp28XFvEHoY1BF9ZXy_bb_jm5CiJMC0Hhn0K2SogOH-2hl-BgxC4yfW1Drb_Y4Xg3Tb69ORkUxNOpkLAmwd6qQTvd55pMOaaPZC71wVsOlV2H0-1JDxrAO7YR-NDbdwZmOkWxcqkWoM3RbL0d_b8oksDjLBZY8XYwwlLQ-wcz0FqDxmXRFhZlCS-nI954kSduTBGvVpWCbdmViOFPwnrZ-A580Oewt1V9cU5tMVQ4aq6s8AN0hB1o-LqBBmqBgfqwKKZ9EoM4ZDT3NWBnJyO_XaAxfkqkxPtZ47Pc1MMtX-NCS99ZAjODwlo7Mue6UfwLPuU2hOioXCVHrfItD2gfj8ppe5YqIYKCx0Dv0G-odgGYuKJdkOhwLIZg-uuAKwW6r8gZb4zn4JUz95nnS7yUgsszE65PLR5odin5wpfyldyrG971Z-shMWGc2ZgvobkxIPb0CNSgMw2E9KT-lK4WtRnBKaPgtddunj_TSUVIuD4T8iYyhI-ldunj5HEgJX1bMWai6rFGCoAeV5X4wbPKz-t1zJbqhllZ-JmqYF5SkiwJyepqKUFgh_EB3AMJTNQVHcxeDSuQ0vd90S01gRRySA5zzx6V5IvMtNTEyHZv5fQyqxizD42dXHCFpsyAJClAoXe2qxR2VkMkn-Eo1SNQO1V6ZmrVqQ-PJGINFVJEfUOznm4jadJJGodR_q2ef-0BksKaemzKf1assfmLo_dT37J-MkAZBMtT9VyOYb39gSYvDQMGSFmjOzD38Am6WZGf13DlC276N6GG9CZHPCi01cAt4ZXQmodZpt2yZujnp-pgkLBfly9OX3C1w--nnCZfOP-X-8Dhe_Spa1DB109ZpnvG8eCx0kd15IsCnAwt6-OnsOKN4UqJ-RGEc8rur6GNxpjL6vkIXMmoLV3kv192e7VKpTZu1r9OpU7Uup0K44Ov2SpeMQtMeiZvJwZYsQCVQesoYF5wR4M5f_cm0Kn4HUmpnsXq-tNwNzvSTC6Xn_wtEddQIw2-jLBDT7LSEQbZdV7B4--qe4Rg3EBCLE56g_mvX4mDAcij5ISy1VAT3SAdLe__iVHuTm9OqDzMhHwPiDQ7pxNSTD4WPbKeFAqQ5ksTlywQX1cdJM7E1hYROIaqhok9hpq7LJSZQbnQck7HcWfIFUufeCsviLEqGXa0d52Y8e7aU_p0Y19KwnLj7XgexfgjMpuRjAmDk7ChsqbVa8Nf_o1sX89gJ4Nlbu6NKpLufqirMwnrEhKLA5JBLUf2zIRe91lkPI6M0cPUK8W6ewYs4PwBccfWaJTwOj4-12D9GO6m-1-KUwTGP56xgOzUEg3soGiKNKWChFAxLTfX0KYXdrd4WCxHKzsK66EkuquqjqqGyLs3wf_j-P9P3-0boJIClRdrp43T5HXIG9mRRbEHsYDys2NcufkmlYT1IMqp0cyakBfHbvOPpXCU7WUoS5yZ3PSZuAxZdRf_C_5t2XLEQlQdwHM-AFbRW3W7H6HTMU3u3CMVvmTbxM1MIdxQ_w83npvHa39bk1bI-JKTYBPhHyUaWr7slhh0ZREkzWxJOaL8dU7pA4iTBPN6mp-QX_ol0-EwbtiwEUa2HDaq2jrrcXgmglD1HdFQEWysV0A4xKlmmuksSaF6UA_-7nq8zd2ho-LOwT9-q-tVA3_KBmNkH2ATmMycJkw0oNgCIXjDKdF8TFVLfiGonYUHYYsJSTssSRVuSS9urF1O3rTwD7u1Ex6MNLszOKOOqb_l6hjP0bPAOpZXUJtmAJWMz_Q5B1nsvSW7x-yWwkqnseIIztl0-Mlt1CCyazrOJJ_wBdygXxZfh7xtBTm1yqUkMexxI1FFOl4qjdZFSzLpXH3GkUZDGAju2slGrmvjxigydVKSKvkVdrGobLL11ZBLbXBu5E2-pHVfO0TW238loal45WE9XwN1Lk14K_bMcPNZiLK8uaDkKjEggdvsUYmP29XK6Z5SfSIJjAVF9DidffoCUTsPDqJJIYnnsuftTrHLa5vkEONmR6J2fXGYhE9kFB3TZcDiS_ycvxfkGGdGbmvE9x_9O117YiE8SlQzqRiyenc2-P4s2ieDfihzQZOIjMJOEV8mEg9GoUKC3SWP3oLl7zgj5vuXyZmlo1dX3trR3A5Z1i4T6zS6DbY-dV4qK-MtNj6ePb2LgOtOYZMKmZf1FOKTgUxwSK04tUloqy2O84PNy6ChKRWWlSu86QJ__zvgmQShNCfwIsUCL0HxXlbx9DJzIt0tPXq3ute_6khbs9OXxun0AtH7oNpMMjpPFizedef7d3sOgrnKAQqeEb0HVXxtPr572jwSX8wFM-Lz6V4V2wBZe4EUE79nUFXSGN-c4ZsBTw9_v_otAW_r8h-aiMRPHZQ8rczsiqnn-RiUQkbyO93H9Yd0MQ-0R1H3QdhCTWfPnsT6vPPqjsZx0BO_2ENeSIP2EHi8pnGi5bpJVCC0PUjIhVvpiy40qOfJ9tPJV3msZ-bant04ShRXg_We9pb9NoW_8wbv2N8c-MPr6ea25xXfcLI29z-_h65BDMTzAMDu0wYF1s4otp5_4ajGWYG-njhKYu53rkMlENtDV6DdsJDUlXWIT45McOyRuuLLNf9FXXgBhD9lgd1XjDxG572UI-L9GVBl2wGxAnk6Bg-UoVETfx_TjET9rnQ5OG7BBkIusL4V4800O-f46lRPxt1Pim7ymDh_Z3bRhVdxE__eI2PvTYR5fj716_LToVEY8P3Q7AHEzDl0Tqe_pRWkONW_gPMP2ffsmOZCKJ4AsTcAXDK4UkRw5NqjTzzPrzYiJwaN2VelRWnm_U_UsJo4aMUCr3M8VwWr6CYjPQImwtG8m8FqhVMJmRl881SdsqcEC3kq8z-hi1xs3diwJsY2HATXESljg4EbasoizoaYVKyvyA4zb_UUehuKdoyrlGUUO03hTA-J137uyBOut07l-5Le5Qkl-Ha6kPlXr-OPJtTGlAUp2C6TkjexoCRF8hrDXPxAXxsyL-xxK7_qa9x9aSZfuAZ-jZl08nP0cq9xcHnj3bIHj4fasvlQe5IjiMmt0EDEiRLM6wtCUqaJZFnvH3aldzPZNfnOzcPVMprpQpDq-O-iNPnlCfaxogPk3toJjY8j26gMd2iiccuUbXg8hTS9zB5X4BcphlqvthhFSXWhy3wMuaXwi72m2q1hggiiz4xCXQASdzJX1h0n3x3lZi5YUM1vbHviahz0PMn8iDDzYBgq3e0ZinYg8GmY1TQWoszsBa5BbsyBrX_sGsakKKalJEAZTzHx2hT9eayUCeBmQAPzgxDblwYSX0ybYdSmj9krYyjGcJ2AAU-Fge3sNXaZBn9ZateEPGTSgN91HA2qsi84FDh0EfTl0c1CHEYCqSoVnyWbuRISAtRW9vKIpmD6hBIcktUQD82f_AVzQREQC3KtUp0zwQlMgZKn00lOUnUTNUPMszBqug-BE20eznkqh-zU9v9BE_Z8rGzobz7JdrTlYO0zzUZuXxUMsMGa7BzI1mE5VZtENc0DD3HjoaGS22nreaHTTW6bkDUppgVGpN34LRELKpD0m7NSAI7Z2ROI0Eb2VSs_qCzinc52Jfx2ktO9m-ARqWTmTpi8zp7Cg9sGggDJdOjlnC_fbqqDINQCvLZogByf29PVYuhVvXjiAxBgGF0041ZBiSP8_ihg7w6i2IrinWa313WKwR2BWzdGl0njpweLPYaYn_kHiLblJEURk7EW0RWe9WiFILOEVM0KzGhehD6sUPDrPGC2ebT3RB-e4okBFahgheoh7uW-kI_5lkSLokRNOyA4K8_G4f2No9CRKzeYAgOFKF23Nw8QHKBDbUl2DpwgmPlkRhrCIhB_BXOlBAvWIXTWFT5AKR44s-ohbEABQjhXGcS8f8izKmpP1_c0YgDM-qfVrIDw8Y2LMbqwFQtxkbEKcX9AtTFi6VjqfgW6HjO48RQMIvOBpGZyZCppdDIvxhx8ycN-ZaMMxCInTlFFJbAq0SDmz68Nm0hHLyrGdIKi0A7knbCDT-S_Y90KkgDiLrH8_wlrHTgdNWI3nmcQoMb4nfNq2V6mJdoGjBGGtyi4i-BQbHobGGpSEu3LS0HA9Q6Mhr3DMy155AjDu3v3zZquTkbR-VUSTMhk51ZNthCLeVLTQl5faBNSeJVpiiULoiozzI4lQ42FMYcuXR7Rn6jOIW9sMHbefTHiVJivAchsEcmtIAu0-st5eVwaqbBtxT4aKgvtvU4AQuGvwDdz563phLqmVjl439txn_zwD56HMvaPZ67X-PjfPqxdnVNz9pLcxYBhV9JLlAyt8xpMpxVc6XkASCneXVU3j9jft4G_yw73arGm7vFilic17faq_xmi2sGdpd-zg_RWfWVfTkxzjIKn7wbaitSa3msJwpvjYZte943tOq8oKCqNT8TamWzVt1-q2nAYspWb8msoaYQUpBbaDiKp_Y6QKiRMQ48oYFfICXzeeUsbX2eo3F3pno4Hs7uOsDCWyG46YI8sDrzL71D11HMgVI487ZJfrisgLAY7p0Bry6e0tCn1ODPTD3Im4oyzJBUM2RKZiEgp4n7b7AJIawqTdHrSvsu8sAbHm-D423JuyuxGJSs8yI0iKo4Eq6EJDb-njjcpAIwkPhoIIRCynt9Omy1uTBE3JCufCNA3m7yH6xvTstcQZVLLJZ3GIS3kz974DyH6LAdb5Tjw3JqVK9fJXlUewsOUglelj4IkI8WrzkXlTBlMHgDZcQPW4MAVCxe9uSRpK09rq5S44bqyk4XuP3rVWqf11l6sjnpaensp_XqFjjTyZb8tVN7DGwFOIyixS7GtggIBgzS-iGaXr5mxC89_HZ-XGywrji9irRHvTUUJ4llA6Hb81ip_g3Kr4KbbKuikiNre0WOflWScq5qwJsnWpdUjC7-5n8D8vC6nPLUjTel0OPOy2oKQuhRbeCy5lxcmRlQPDE7IFOj78hUFX_yKQYmZQ-wq4bwbKxPECTBG8zoJ1NmBFC8jmfIIhcjZmTVHT3NHQ9QXh64OynklJM0fPuY_wj86PpPUC0gz7TtI7DAdZ9l4NptdCzaiejpd3lPJomaRVwF5VxVTDh89d60RmLnOp0zEOwpZ9ZnweC6z7lnk-tBce_I9MhC7wYT6eq_G7oPbsVUr7OivpF8tHk6c6XyTS-gvneDkuumTnRSFTwwsGhY3OZYDuV1yy-1JRQBcJtj66p_6LBlE6ZW2nWk7XC93ZxD7XYs6tqeEF1rQNHEgvrwz8JUErZ9l4GKlvYoeyqrqHTSv_rugNY8bin-ARrO8TO48SU7OEXDKM7pE6FKuX5MdrmzSmb8Dwgbsp82_qqfgRNdEn7bd0T6438uCqpg1ZXHG4p4Z0ZqUrRrsbLtJcuutl6JEFw6uChgip9RQMCSTkGomTYi_oS4TbX7yybSJDNKx2OSLRayTe8Xp5cLfcVGBZ1ZlZ-aK17D7bEt7iUdSYXFymZqLwrE8qYFeMZXSH3Z5ygIC17BKVykJXOiHKmzeUnOH_JBS4XeC9EruOw-YMjjsnnADtFOw3DKN943JLz5T2KAAdNInUeqWNOZWKYQhtycFHxcTOc12TzVWytwaXPmmuMFSQ77sADAq1qUvWrEYTRm2KHiGF8YDIHdey7UyW1Adkr3qnLUb-zr_Xap4RTDXuFp7RtkLePqnufDsg24cj9hf6iY7a-yBn_xxYPlg4j0kXLNkUYn5gg2EqjKvKRRmDRiVW-toULSigtGpRgsIA_f1p1K7plOUDmhJdiE-5Tf29qfmcuaDHoTf6hZp9utjViXlTJUn8fBxDjQDlNB1dEjkJFMfWB_GMK27gI-l-Se9_rqVeNQnF0j-kknaUj26zL9MbJCczLg2iNR3MFMV9wOnqlXZsjf81vz99iimi4F_-2oz_M4_kdhsmwHpNlAmUr0hi0wK5QodNR05gCk5tt50g5jn7ZOsy6qW8lvRbqDfObuzyfPRctlxyg7Shxe_LC4eAY9GwKTd0UrvJOS-qhdZ14CJpqFnA4Fu3CBzrBbhzTrGOH-fb7xrZqrg8v1vTkqwXCezTX6UN-1htEJwRw820DC5J0b5YjhrSQzAbAY99X-ikmW44KVYGUJZdprXvH9WH2lmi2d8j4Cigw8Zb4qEAYXeJCf0CZQ9xq3G6O4B2aeo2D_GIo8dZioK_Uxw-YPxyv4CkANXPtEEcAOL12kz8RrdTRbMs1pvLfpg7XOk5wV16I319lTsJWWOqbOXqjVdlOXJATCpXOFFlB7lYyQFPo_FE9jLwTu0YdswpVCkXBgOXEa6Z3Kc7Qm0NLx8gC-HnTBMQyB-479bmx0VCOmw8sJippTXothwbU22j87_JzyJw7gaO4nEC53Lc4nNlLL6IV5YiZo-Hc_ZB3GUKzNpH3yAamKiAIG2QpxkunZ4kR_MRsEagyuuz3P17CzVdENuMW5fryT3cuHKrbQwsidnCxKhYer3g2-sNzniTVOhV1iw3xxDdiMiBffKZFQPT_hbmLq9U-uJv5__J_DOpYecRGy92HjSfJWLG11DaioSEtd21bSU1G024lCg5J1riZNDj3ZsUQ6rZwpoim1d-lH0S4MvFj4r57VPErNKXc8jTKgvc2bzlYLIUWF9rzdPdEpiv9gmfNaYSk2TI8oi8pVUuM9N9Ym8IJ0tqXu5gQldiWldxDjQ2s0eKAOuRcyNXzBru9XT135qD34s0k0PpQYSw5JaBI1pqtQDF13NVlnKgdGa6hU0lNiFlCJdXjxMe6s88RIT7sgmvyY_tARWoigVRYvrodcjej4YaXamY2TXoXGntm3n_up_7LuYV6Rmh7Q3AbECeJ9R7DP-psjpGTEV7tPyUWyCexVNzoBGSeJQapD29LYj_7SATENPYauhVICpT2Lf6rlFI1D3ZaeU6udaMsmIIvifmrUXhRGjQsedt4IKsj-VPefBqu_KH4TrzTW9PPnfpIfmkzo-prK230z7_B8f1AMqKD2nHB6OR_aVkeARs--m9dlruPNCml1Bay-N84LO945tZWsL_X9onbmWlD-D8788Fv6MwLNvm8WkHcVmh3bkzRzFTNnidDtW8uC16hBQvI2Sk3OvO7GVAG7mF8bE4rfc8RXw0SlYyfFRyGhrfasf_VqLS6-1Oh5Tk0jxnM5PX87sMoITc_xECCWCwnUM77daDxJhS6SmRFYG0iZFUNWubEhcz7Vzwn2R3jZkEtH1Ss4xCe2KF03HiAtgTWJ7qE3PkbQdNXX4N6LcxvVBBLgqdWpvhXS7tqX6Dx8UImZOLNq13zPc-QAmnBHj9lEdrSxS9VWuMWv6Ht64zOCLkc75LD0mFWNbc1tvC0WXcnS0l8RipOOY59xvlE-Jb3i0bOoGaNUCs_OCepk2cOhA5yk91GTE1uSKtPuS7-TNRWYViqrv-YBmsDPQvEnK9XivrOptz2LZvTN1QIW1AhU6Pt8awUqJ2FhtO4SIeEe_OCU_6B8155Y4qHzzKeKXeek9HP-JrP-IhG1d0KT8Un5vbyssZ7MbyN45wDOYQt4wvcKGq0xI3-NENXQ697450HzbyJ00osCXXHyIfDCpbarYgzNBqO-mmMwR5qFcLg41EMdsbLJ7XPsn5lDBOrAOEBs1-Myar6-f9xKKk8xYcsAogs0aXVQks94MGEIuyn2fgDYK2R3i1yFcml9tA_8M1P9bYAyi1fcAgCwe_9akJi0agR24IJWLF1l_bn9D7I1j_8livR0_weRFeilIlCJFzQoXXYImUxBaCilrsoo5KfbLRIYizdvO52Pt03685XavdHY3wLgw2LuwkAO83z2ZVEBy5J7HoBVQw9GL0FlcO7WX84mJiEFfcRoOC_z2DmOuH3jujxIjgWb_BBq9gWt5-_RB8lgWoEzcDD7PU7yvlwEALuDIX9z_skO2wPh2_gfeO8es0FQ1t-yjp8fHX3UkLCv2mv_I4sspk0lOmkhlbtlEB-O5Gf6d9HE283pJAqSHITKPPYriqUmdAHXG29jRv4R2kD3Z8sRV0sucPx5U8F5FbXqaMSml4-gmBr-Q1pH86kaPpz9Dvvx6XfbQVm53O524g1VhgXZi5aM-mxrXMDzhUEc4R5vmOZrj08-4Fd6QaEUnEi5uu-fPKVviEg6XR4NHjusVy4HXLGgYz7j35RvozCv47mQ6ZTD6q6aVL_vpG-mJ4ebL_csX7NRQ5LbkRlAMOz-6MEf_gLODaVEQcP65hI3dxCjQp03FdKacjRocFLJKj5ecU1zlcvz1I3n6byjIiPLBbYSpxukpg5Hjq2zSqSjxlL30R8mMbt_zg9UVwBSvneAmnpHJBhEssLKwZMfmSUPJwHeFAGXqCCsW89qVvuWIVsLwsiOkRkiSNrA-3ryJfuaVE5WPtZuIqjtGZnSTSZ-X81UN0BJtymnGJOtqcRKMu_-zIKhovsxB__EGmWKPWai7yCjegmHAzeg9-LUHxDSIPASQyBUukIY0KSh_BRtvK9Gh_F1zsAsvnLOk0MSg0_oAOUX7UybmayaUry0NqyfSTPiuWW2XIC2FW5MPN1EigYXTr9OUWGbr9OirqggmsptuGJTvfvHXHaWh8wRGfyDKAWzT7u82L5WQa2gEa2s_DHMDOpL00vX0TSv3aSGOTEZmIuXXMd4F9NMxWT7LSisDrBNEVZsqSjlp2ysxO6HeP9I0GY3pIkzegdSv3ji02d5oFF2JBbj3B7AjWhroaFvIYVDs0qL6vzneWpFTSVG5a9jL0wEXshMsTvDqZE4Qf6N4nqfpM9ajhABX3_svlyxVKflZhARaCNJDVELcy_HQQUai_uiD1A1TI3jmfhx2P8syfDST2TSg8-hfroGMZy8mQLjyvkEt4b-qc6ixK7v9q4Jgve-CmL-K7vREp4bm_qt-6JaKZuu5kXNMpKf4YwuSyeRMC3NScq73leK_ydqCYDcoibCxdbz1j-ygzbGKn4mlcP-ox_-FMRriOtuHIOCLmG6VB1qUe13m8eL8ykOmOhL69wwoeqdZSD_T5hTe3U9zXj3r4jBvuCjVvQiS8ENzBWJ74p7TrC9TwuFHW8geqyKy0tUWbV7BXomVrDSm9a7Vpax0CCbZEeM-mtJupYCscRze3P9JyZ8E0_jvW9vpsU1ALj6pcI4taQ-HcaioF6ojEXMMg4HT0l4v4Bm1_Ko2B8vYBocb4ZAz7HCqArgo-8SBg5mcY8G8vlx5IhbhbuLwxqzwUwPzzoYaa18BMGYbqpGssssdf3aWsYtPqnes5pOZpuzHOUL7E2zZJtBkDKo0pcR7S7BPDzPrrxABf6K573m0iCT2WffUxI7N5ziVQNBL3dJG1tO3omUlFqXlmuYLI6c972jU5V308HDZepYKEpws4q-W-hcQqQWb0JWZtBbFmfiY-gXDC__1jr5MF3lmxVU4Yu4bhZ5_T-or6X3Sp60BhvPYzq-bIyZ7MR69_5T4enYxqpS97IkvluslQ70y0irUdRlqTBoSTSPY3IKDu4eaJEKkA_jDRZX1O5Uvwr7EoeYg2C1kdo3IMOEvgWWl_GdxYRKFEZY8pSnzNzk1xX7erJfYe6rp9tJvR4CFnVyQzPvL8df-Lf6d4AR8uCclGTOmFIlzxJRgbX4wGWJknp529DKyJh5dbqlhUeCfDA1qIyh16LOYVJ51GIVaZer0VTI2rmMC6_ViQNCHIv78IBdkxH1BPem7IhT9wwsSNnijUvSJEIwoICd6JCQxYwxG0w5LdkumNozLOK667ajpA94WVPRT21DGjvFf5ZjktekFH20ZpmiksItA4QEa9VUrQGyq2WXumImECMsW22bkm_rRARIyREmmRHtWlRl-s4Xhc0xn6Kk_7tJFOyZW8rsvLM5yki_w6VpbFFRB3stVuk0-QdFvaEDereij50WmdKZXj1-6E_gm50S7RYnIhbRqOQY5-dop1ER5c6aF-kHUsSGFwyXjr0Io3d1SPxcbEN0I1NfKzjeMiB-gMrRxmMrAaBlR-7CUqbTQTgN4UAZ1eXidaInnnyCeYuQQLqvBY8doPV1Avwd1VVZAT7LF6S0daYtwkwfSJf5XRAK5KdutNMI0-w1_S0eZ5I5SUVqqImD8AeF31cQUBMqhUMDTqBtQNo17-VOOeeR2Pr7Gci_GOFLhQLCfJk17UJr6eDAFEwHvrw3FZ4w7grsbyU9nkAgoki7KK5xFMCZ3j_K6GoEnJbQ1SVAqXHCKfkVeI9S6S6I1BWnzeysIOlDWhjxpd-RWVCoqUY8eQ2MitzA9SfmWLGEkKbjrv0tfnMcqv1UOLpebfkayY2PPJwDZlgr88HbrqMnNvhVLt77FiFdMhP_Vn8ZTlKQILuTnDcY5qgOBhcusY_MNNiipyBfnLZBCOMkBjcHznEznf6iS6McL59RX-yY0ItC5wr6vWYfMWTzeRs6qncT3Syg-P04MKi3aSitnjwVh_SOl1j13O559RjnWmdIV5IAuZymeqmq8H6ut7O2Hhy7RMTucsxg9PCMkw3mmXHpG1W_QEZXGxd_BRxKBoaW2JOSkD4xGnY0wZjxbLgL5D_A_8wOjYv5tY1TVmddVh7Yz2lghhFuyImpDPTzMjpDXl42q6CCW8ktT1NCfYhx48rNkfzWEGtjvPV8KavJin9sSTpi42eBXYxElOWyzAysFJPl3UfsfEr97lcsCk3pWedMoTEWVSxgqAC5gwE6G79yO5ClofEXuSM2ZvzenkUgfuhR17jQc-muc3J1sMpKS2L9lGzaXIvrmy6HJlHCbgjRAaOhyQ77UkOyzJdUImUuhiYQgsW4Vd39eKcp2-MODB9907tqTe3q5dMbvi_NOmbg7L5a70_OiuBniIsBPruP1dQ1xpoWm5IiL2o_2WjlDYJwkLjCIpgxlDKQiaan2cvKyKVriwG3vO3aRdNnDtGNKNscJVfij0sPIU2v4URzwnaEkRolTExEcK0H0DGtJi_sdkMQuTyYFhtcekbHLUSwz_tG3p8bLZWnFACPDTksAXR2e1DB8tXmlLqYjpdi6hyPvF3rUb1uJ3X0MgM5dEJQzNXP0OW4m_9DPfIk_4xzTmFZbdT-aHMKhHuAECd_D3Hcmabpgf8Lzgxw9sjUExHEZUkp5T2uzz3Ylvo6L69CE1UV8l2All6xkEGEa93sVoWPe3MyjiG3ax4iTjcfivxR0cwef84VP3v_xLDaQ_gk3mojRtg7Xl20zDcUBnbiaZUSZv9UsIYSgWTTQAAuQLdl0QYV1vwdc80NAsTg_WvV61Piq3l6-aqFQgwmN0p6RLKYhBzS7bbz7i9itDBoljL5P4WS6C-RMuN08Dbs_gazXaIN4jWb8hUy8Q0Orc-kPcXbO32LP_A--bDbJnq5AdTmDxwBMFlITHdt60jZ38hKJ886bHVpHZd8vO_eP6Nl7L_VVYklfaltdNDipUwOFHwM5RDH9nA3pmbgdwoO4YjeOPxsobyiCkneMkMRrotNAbkUiBoa3bOywG-RlJuCTNzh_N8fpONWtLxy3wiFWYEdE_myEn3D7I2ZEt5kdwwuOL4jXMenEnRUpSGVtr5u7i32V9J6DKzjLUYVTAVc99b6OdRs3cYdT6OQlPCyRflaGhNxPD8lYJnWKVetkMqezFkdjqZUZeqJO6U555zL-HfUAxm3hpf_4pFGx6bPuQ9CxuZDy_ZTgXA6-l4iTwGtmm4zm311HL9N2Wr0ElMqEPNScrm_8Sok93_30kzrrNKUFLmB7IVEwmbg-sKSlERMfT0xhRuTyfHz1fj4awOc0A3O3Z2hFflU2xLSGLQAroNQrD1E1ZSjbI5Xy4XeNIHZWPvivy2p00ZWHqqi7_WaduGVPpAFQ1FRGtzqgZq1DcxFLIv1rxr1FGFa9ElHikjjoPsQT25wc3tvKBdnl-WI0Mf4ilWZifW8kY3gym5ZqceaR7PgEtQDM4-To04r8QMaolkcTjemyBxpQVdzkZIdGqA_edQl_Ygii5JuiS_Dq2sDhLv9J9-LB4TiOOOQIuzv9y5CdSlLhaf3ekKeyZqOkA4prly7brppB2bSrdmnwfhLDxO2WMkYclq4YoFSd6d1CNEN5Zu1zh-11Is1ckbVAu0yI4Y6GJin3fpY-fYRKevaxTm2eFTdYKDPUhMUD2m_24EnE06z5jsSjPc3PQnmlsvjeMpiLeqdswoTMWuMN173UHGZ8cuFpwN1hvNfwgFAVDPtR8Bu1LlexIushn8xYVgsN_QVfQ0Nzt1w5SyAZmW34jcH1M4Id6Ohko-fhOOxY9oJNqQc3S49A-sFpufQ_gy_PtIpOl8Wyp-I0mELupeCvIqrDqGUm5Zvpf0HGmjVvdFwCOEivvLejUlQCeeqeaJ9tUor78xfEY3BHTlyTFCyFjAgMlWCRvcx1VW2ngJ9v_QcqloL6wa2iKb3Pc4yfdsyW7gxUToRDsa_su8IEjGJyw0EAOyFcK-K3K6U9Ul1SxRqIjbYiVuKhR2I4OqItu2SdRx40SiLl-I4X_UWHAqO3k0Kog2G6wF1eNizHDmA6-OEurfNDaoME1SLsNewogb7h7_vn6d50F8UWnkeHyRbt71uBr_kkHMagUQwiZXyO-2wuzSe1T3MoMu6J66lCONospu-BEhfzdZuL-n7jrF-YdyuPFufGHC3Lgpesn8E7s4Lkapzxi8we-iKJa2MI0YKdF__cG38gtDsANqfucIRfb53PFXjT2wlmUVwTQUi_5GHO_6bdrxj02Coms-EsI_bQRmpRciIvRZOsoalvBhkygeopG9oLqjq6z_ZrT8J00igrX9y_A7yjoVRdzv5kRnGh-HqkGU8prfduFsJlGtmGHnG444aK4CHr1fYOZfAwc2PSdSbZg3LjCBkssqG24v9QDivcqh8l4XCNUYLDa2ZeFJSWeskjqqShudnoTK6I1LND3R9oxwZK84KFJTU1KSImSMqngPoA_3Zf8LIhXT6R7J3grqKgNkBrGgl8caw7YdgwZ9JEaThk3mYH2Huma5NBg2vBk6zLrivgNHe8rBrRYVEnJLpcxOFA3TnGMcL6elPVeULkG0fr3VihkP50O2MxEIubKAs44Jp24CehGupzqxAweSRlKAIhvfVuVN4iNCUkIPh0TAlFUN2wlGIg6W6-y_3Gvgt2tW-5yS0EsxL2o_SgzvKHp0e29ETNzke6kA3z2ksfHCsi_4OAmocLvQFmfo-6nukgWfNvcDA5Vb-j_PtHj4Y-rv1rehVy1zAlfUsruyA145bkJUbJ-tVaTCXwmhVYo-pXol4HE3Yl0MczeuuYtFcF8mkTGrnDMIfdFV2RGAmOQfANWaXQopGa_ZDYd5O8KVDfTA5-v3OwbHPIku4R2mvcZ1rHXjKliMhPXJxls_XtA2mucvuN12DbxsXMPKmP9M7qkf0oPYSV990q8ku_ei8Ft2kEbFR73nFvRWhk7dLn7fayfvuJeGA2ggl2dAD-2meIF2RkSh1vHUZvGt9bbgi8S1ZysjBXTEFunF0-zXpekqyvCLvXDWbRgo4NBnbjgAlp0KLJfTy6DCSdAMNV5Ublt0pSAV_oqGTsx0Oxf1XD5d_drLy55Pp10F5g0JbKuEvuSQ4AerBBxRMX98QZaBBWFsvqx_J6-gg73e382fx4SG1XaetaztKBHAbuZu1lNdIeLzP4PV8q8fxcA9U4CLMUdGq-2T3eism293ixloPowsZ7mTz74EHyMMqR0OJ52CwrhSKoqiI4wZcg9ahijYkiP3aLoIhh2xTiuiNpmm_FK8HahZ1Qr2a3nhvDn0NcBUzNNhQADTV83zBoqsWx8cvNK-248VR9tLe3pzV-llafgSx-USX7FlfvtxoVr5My92Lu30uvM_KhrucTFwrePjZKVUwajQlOEH7ZqORsiWw-I2-mqBtRm6MfweBHFXm9Vsw53fml-w3c9QpY4rnNpBwYS_jOKAH-hpI0v8Hp-6IpKBEv3905P6ivSKnZHjB_K992VcDzzKlPqmrWGzxps2WKG4Gym4ToTu2eAb4CWRJHuIQeJwJKaeh6SAo2wqbg_E9esG6NS0D4GPVlY4A1bFrbWMbr2hle7o7YuSvFGLu_rBALGYpHQisKNuDigu4PP-fi3SEYmcHHeClILfUjgjbigl4jd7UdARglunlSYExNiucr1ldHI33RmsQVFvLe-BBY2dY22TE1QRr3hKXSjbd4MpNidtNrNJ5WU96oVg2ch1fS9r75rpN5YQgZl1xc0IfKQg30-RjXxtZ-13uwcx3V_tTEJsfURslz1grxCnN3Tvk4Gr4T9Bo85xD0nqRklsW4QgstmZSORuRff_8Jn1giKDZX0345pL74iP9wOCEuuuZue-6gMJf_YOfQfZRaq_GN-gw0XIaYdU-qThpZRMECx0E0f18Gxu3uPXR0uAIV0yravSGi7m-ojKfstc-dB1u4_McVXjPzRS7UWu2S8HKLjVxWIRkkUPHtfklQQ6DWPFfKrDGkwTlmJh_zRRcT_Mxzfg0UNHwnyKzzwkIzixdkXkGP8A_jq-owoP6vNCrtI54c_VwNwMvTdyCZiH_ZIMYvwCM4UN4CxFeoL76ggZEY9lAHyrqJwqleNUqRPzWIUtCeLYOEixls7TjBd_7r4q8k0EqnELVjjxjY608AlSHa5Ed4uwo8ULnbaehVuKnWoG4b098GylQcjsSF9rn0h4ab_QdBzOOmaJ7gvf1nKyWuhI6Tr58rCQ3XTWYz_o61MigPq7DJkiIDTJ_HKYryFgCeNqUd_KJe-81TZpRx2GIFEM-nC6qvJzy19ag3p7Sb09NrlvQjVJZqjAbSpxKNSY_Ug9PLBeAll09ZXettRJDQTUj09EDaxy4IVvazi21rtpHAQCfvImFezEhcsYzUXwe0o352JTYwLhgFB9vIsWqjpWRLaC1hg-iFDjUirO2oZSFSsh8uqli7wepMkfgWywrNrwJ-5tf5Wy6bfLZfAFR28CBlbTl1y5j0pjrZ74AbPikYvON9OgK0k51tIaANlK93Wu50endpFj8MMPYZ1iB0H11RvG_9EQyfFdrc27kf5Qp4ogzC-igHQHk7C2m_PWkY8CNdiW2G74egFT6Nn_tolEkAhWoKzEOBmOnNq9BzCxWiuObjapDts9sqiPqVrJkyke73IAS-CPJoDOspmRArMZgbUYxNmoPM2o83ry1yygyL-U_0Phh46SUuWyg51yl1aMYu3RgS7gzmQiyYJFynGLW6mO8ZpbnmEsQdP-iC1H-o-vtCgQqRugXQIIrYbWw0RaoA7ujxeYMI5vweAF4pC6aKA05rJ8JZucJS0rAL59Nf1mTQ3ScVgc_QwbasK7dkw-W4lchRvSjaOzNFgsMnFbdoH0fwvkPkuNjaigIWnwEg-dp1DLWJuVgpToo9QFIn5YOrB3jbbUCPyOJrz-ZkRaQFd0ZQswDFr_iXK2OqwYiqDgofxuqBDVFMk5G3Pdyo-PKSPWHSXhH0e-eMGxjT8K8zjqWIeUyWHdgD6zIsjnhgTCOhBP2amlTCDO-T64bOoeoL68szgwu-se5Tpa4Ph0AcgvjOJFdHdTg7A2y4Tl1-4y5TMjEq-ot3YqiPZE4sj_nObGbyI2D3hcST5duxhMXElNzntS4Q4yfwyaPrAhMdlLVsoWTD26kJWuVNtlUzejKYji55noWsGUjqFzJpdFQfVC70MGDGLBY9zDCZuy_Uf-dKFLFUcS-0ygZpyC1i_Nd9D5UpdNKU9sP5iQTAKN0Inyj7oibi3QDZQ3ZkluQ0lAPUtJAMrxIFutt2OCNUapkYotw2PNkbkyDXBONqBTMsfPq3Ga2vFIZehD4CFOMwN3WrVuunnqOWbs6dkKtd8hteS9HV-J05AZ8yadsvgG7h7Pgk053YrMYb3bLbYnF29H5fTZGrQZdcQNuH-FWwAeSsZdeqITHEklgnjXXZihoBOgu8DOKacEnS-XgHfx-2742byPItuXr7P2ZkzlS_IctfN04OJ8DsYL6wfOktewD7uDHxOtmLve5bb0HcSJ0e4Q-Ez1U5w5A-_jHkJw24mJY9dZUkGQ7rvs75LnfqPpm8O7DMkFArJjEURZCURVI9FrJ6s8gPDGAjY8XPOIFkZfkWy9K41MCaoXEFvmhWZT4y26S0LBXkrDy7fUsBYezGvvmOh_4d8WesPs8S-4ZWEd4ymRvUNGI3QpFXSQ4TK7TncYeR9GdAmUOtBO7hRGcoStu-jPn7PEPGLPdx9vWaJhCtG15ruVuZPwVnsXKUq7ctMHJAtc5VBKX1kgf_tZQTyjNMqzfh9LCZVnpnhSKEt13YS8dZnLtadb-wUYO_1b4lgYPMXhitg4AiprcZVsBAwwQimzO5T2OBIWn9ys4jBMgeuBEqnwYh-EpTmyl2svjtHe4x0V4gkCkOFTVfHhn_b3_8UBy2gpE6XMAKLZoRed4frLYKauIyYeDT2e0UH9PPoL249nA3J-_oMbFSDJVqxbjn96q6v569mIKPewumlr5HifgY9yLkhadSBnzyDta2v1-m9__l4GeoJD_dTgAtXJG9m6TjVbrePSIXx2kCO1qMl0k1MWhz7Cbfgimptufw8kzE3dIh4FXjYa1oOzmN0W21qAeBXDKDp6TJ8vNClNlSVUDXN40IiGTPbMbIW2sev2uhr8VxJJicglgrCmPfhcjlnUsbuatP9NPlEtEyqrRxjxPpVxm2BVIVXtBBRDWYUQlR_gDAcr0diNHMqaXyJmmQ9DwsjMqdTXlNiz6AdIUaqseiI_VMUZdvCvBRKrd9dDf_ywaV7DOpbKwNBep4AzHTP3NJ1O7OGnGtge48Ex6g3mw8I5W27byLx5YYLdK4JmnonsDmqnbDSwTUyVzYvIyOkjhB84RP_AzJuURpFZb76mNjZ48tp6dp7sWeSd_82fQ8v14NZ8gwRmq5YOXisMTjwr4PV_bZ5GZczEbxN6EG6jR2H9fBdvJ8EHoRJmiyAuIuuKKpFP_Kxj2rVnMIzXH8okbR0Q8468yjYSmFCDPz7bGR_dMxBKRBVRAbY3LX3x5K5prZnyGT1PRlAjgjvCTuj6aTMT4iN99dt7FrY7V2vxuM0siv43KwjgSwTNHOU7FNuVV6UhBARl0qKWj83Ktsw-x0fS12cA8wyyTNfHYZaWRKjwHwB4NZn7UDJTnnfU3H0HEZ013dCmJEbflTSI6TB4wMMWIx2oQxm5mfodjD9Ps9SlLG2h0K3AW5mowMMpeydgmspNTtOuk_YNHBFSZveHLgLpfAFm94_LzdKcNnwPleVtb1_l7HU2uj_aWNh5l3NSc46IDg1D90y-BYS5MBMD_4OFktJWBTq8zOoUkVdOIoW3vByzNrx46ZB_890trNpFcIFJqlJJwKuW6OF9vv4R0K6whnE878dczoib7lLCm6BTqCgDznSgd7SK9hxWF00usU9E-a8Ci2Vp7SEZ5w67hQqTK6BpN9kpJBUmUmfkCDNykomIhAhmsRAt4-xJyENegU6acYbcvukjnd-cshFBYuzThSV5_036xeP20DHi5j2_5lEPtL4pnrOv8ANnUJiqKE2QPXMiwVj1nH9HSJm4PFp5o7-pU0FP_hSp-TwRppjI-eCJKX4w-fEtSB7ZdMhRFJCYjwPU5eYh-K-iPfjSZJfYG3JlbuvjOf8U0YzY-tu93KvaZUusY5_iT_MXXIABdCMn6qLJBJd5xlsXqx7WOhv-y-oFOPPagS0Z2jQRHi-O166pdmkudFkVQNXubuV2TVUOAmWAmpaXSSSfrdIw_sF8vVaif2PNTXwSI4G7h6wFZF0ed-N8CjRxsZGhxivLGMtjfcNhDEQ45FTceBEOUb9SQUeptUDVFvK6Y3tlqCSwLLNLliXLrVT07cWv_TEJLJAEPnTSHTo75Up1tAnAoJzE9zA1Eh3MzcP5UANBojEYV4MUu2qnAmSaJGPJSW-rLbECiQ3COfcRVgA9ROye4yDdbJW9FW993TfTUaOr8f1aADJaXbVnfb8sYkG0XBVegNaHorTQ0mpAkAE-KcLQEe6FLX3myvsthADBKbendG8E_d4K3G9lltyERllGCXuUjhn4Yu6FYeSYnfm569nVr0d6K_tEZxTq9ysi-nU0xE3pnVP6NYZ_mVQmVnprABlmlqE6c19Qq-74Vn-8vR0vsqlzE44vZ1zU0QnOFjUjxWmV2o4LWX_yc7-sH34GR6bh902T8RSbRwgO9AWVoQZ1byEbypLwaPI9N7Fyw3QhPV4c5v2rz1jR8REyD2TNGp6nWCchY0Ds5NDAYyzBBzOcf2-eeQcHMe2rKU_-XTADylVWPqHTSqYtrWG2xIKinP-882FoOEpyQ2E8vU-mO6EV0Opghbz-jCZOcLWGb7-utOKSOEJ-H82o2Ic7u0RKW1GQB4kEd-CohosaTU6pER1yX-2n8nm5TSc4xCwO_iaByC9CxZcweJLQV2UgCFN27DyVxqONfGAmYnKjY4-k1kQhlOVbMjowudpmd5jp2VwpbIbn46QOD9X-QpTkADxctwRAjz3EUclaEcfrKVYYjPKhwSd2iqH6a48D40yzlrPiXIaft-l9-mNbf1CUll7Fc72mu36jLnefUnRgw07AC8oz1nVQP-_zTaonD-S4rYO42uw18ijxxt77Aj--2t89G_WRUWukbr66BiQB0xbZKYcWXR189LMdu5hFrsjKcLCXWhAmoSe4p6XQgVIuxwOVx8KJ29jHvBSiiQSK4pAKXWCs6yQlMBgX24wDdZuPiNOW30ar_ecGsUp6uCQdMGGck3f4pNYmQJionsRJqIrXh-UCvcp3-vDrh_wwzt4JJURPXqW6JR-JbAwhfirsnZbxO9-lPJns4whB8f8gZ0b9pbkaMzcuXwprgNbz46NAvb43HbLCrbJEcx1o0Jpkyyl8Fe5E43liNqybXz6fZRJcgIDeLcq-ca61azbvHUCK_qj2AjCVvxHA6GGKwX0YnJXf6_wwibBPROivTC-WUvxsIgK2q8eZj96ZCztdupbpX-_vrG2uTF_XT3tYy_isfCDKvAgNO5ZdiqJdlDigoz1X3EaoOYhF9FS63pEtfba7dQLBTLuk6BI6JcN8X9ER7YzKpl4JrEPDv4mIg3ob7OQmK_ycXW7q-ox1fYIwZsBRqvIyqFBoyRRFJCd0bdVOY1j7DuHvj2c8Ou4Rg1cKyG_poMm88LNhip6L9sq8JwJHe5poJM1fcd_I0hkzMZEWBm_JVh_DnGaqw5tChsSm9IqNNvE0CZZhcJrwUomvIGvuEcDj55Xea9Yayjuu0RSr7Ouv_2WNQqF7_D43rCS364axS-o9-ok24lIOLVQx-nnKN0vLZ11qSnmIevAa5EkoIi9NSXN9Iy_EtxyufKIzYY1uAll7sjqVvSvmNkHAtOFCElMScdUVPw05tY9uc-Z6zFII4jBq7fo19KL6sQ1IoV9IJD_2g1quYRh5eAZjjImGoaDvyolHMlv2mzyNQ7uesJWou1LaO1qonLby3sk58VhC-Gqn7WN0kAk9nY_p8VBQcwJ8Z2jwAxpcE3Y71J_bnJJCEipnIrbAYSv13f7-DGSHypy052_gf5mT0gp6SEAeFzvlZBUPScLU6a4XnZPvaaUIMCfHsrEdOjHW0trbiy9aRF_ugeSLoc4kYWdpxNqiyDfWCQE_-qVl-OYFcKKgvAI0okW_dV3KwPfXcY6ASug1gj169GndMHD2KHNNsSVw2_bTx7gcqCKJ7a8BxzhdIddq1vE-6ZBCxrbqPVAR5UUE7elTAOIYRMX1retiVlyaVr2Ip4i4hK1jr3KvX8NJM01ztdYv4j_OpQpovtVVG6mgvmYyuOPK4bmwzkb1VC1wE1W-Gll261-N98KNp2X5rSmqYD-_ndv9CpGPSVz3fNVSIlizMiztX5HyzGW9F6RcyOSnC5BaeZMLps99WxHe2yKfurhVMX22g8_SSj4gFXLnLVOGhwGDs11UqlcDRoF_UN-1-LYj1asD1lZaE-r_O90vcJOC5till0mG3uAP3_58YjdWsFVk6rpGewLzRGHZ8QwKPqrAN6pFNzg82b7xbPDzclVpPQCTFh_QV8setPlqFzDftxREa6B5ujotRcVXOVgsrB-6Ymxt31EztS2gSj9FSjM5kRIS0BklaF4CP191EE1NoUY8EqP2iwWCkr-rffi0yhPf8tf6kcECDOAHy0WJn0X2qo1LAOkRycV7lNQkEHkAxBkKORbmWC__rWZ4NOOfYtJPSuK5qa_nIxpUV-vQVKFB6HQ2awJQ1Zn2h9FS1zazyiNePmENq6QO4pdozJLxZAFjU9obVXBHoInlUaaYDqrCP91WX9Uhaetr5mGJGjJmPo0i5rpZ4SulpJ8aPmhJ4Kr8vmj1-UgOpAPatx_qFVBaRimf79SPpredTdr3ByE-zvVKWu0yq5PU-Mf17bihRyjS3phyKhpEwzmgBxnil-3LN2zEQwxDPdmOZhWMuCsBmvWlZjkMRgTQLI--hYEJkWA9GbmzDtGHVMP3KLyujzzHfq46VjQzsp2zNA5yGlxM_G14K3fcoCHMr6eGHtg_aDMXOCpFqfXPx9WEu-Am4Mt9AQxSbZJ2nRPdhlJT1VncfRE1r9foE1mg_S7rW9ldaLf1L8x8eX-xt6eBeYiinEOn-NjnOFmsylK_V7vfJIhEjxqnXj4qiRn7lc7Wh_oeJcobaYNll9dVF-QHarQbtBU3hjSOyrrtWKOYsp5UDP0SnLI_xESrZU7Panoy_d7-c2GcirjnlRAFAE8_gh3606eq4CmxlVTvFSdTAVCbkjWQebCjostiK7APN6ffTtoKHjIlSY7-yl9I-KoLneAktMegKuK-B28oY5E51I2HoNLx4mvFbm9sc8gntG1sFu5Agu98cTlpaIeYujUzpLLq6k4b_NnkEVIHNcF6tv6xwtXx5-S8cG6c9N_TTbSVmoxu0tpLELn0tK-MOqcPjpe9jNWhLMtwifo4_XMN17uPNt52brDzEKAPqjiF5UeH2udYiXyx349IMQ-k_YSVW0YXSKmMG2lLoDoX6UoMEXvSc7ANwjOLNLvdJN0","n":"Jennifer"};
+const NS=PLAN_CIFRADO?"porciona:"+PLAN_CIFRADO.id+":":"";
+let PLAN=PLAN_FIJO?JSON.parse(JSON.stringify(PLAN_FIJO)):PLAN_CIFRADO?null:JSON.parse(JSON.stringify(DEMO)), S={dias:{},entreno:{},pesos:{},comi:{}};
+try{const r=localStorage.getItem(NS+"miplan-datos");if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
+function guardar(){try{localStorage.setItem(NS+"miplan-datos",JSON.stringify(S))}catch(e){}}
+async function abrirPlan(clave){
+  const C=PLAN_CIFRADO, enc=new TextEncoder();
+  const base=await crypto.subtle.importKey("raw",enc.encode(clave.trim().toLowerCase()),"PBKDF2",false,["deriveKey"]);
+  const key=await crypto.subtle.deriveKey({name:"PBKDF2",salt:unb64(C.s),iterations:C.it,hash:"SHA-256"},base,{name:"AES-GCM",length:256},false,["decrypt"]);
+  const plano=await crypto.subtle.decrypt({name:"AES-GCM",iv:unb64(C.i)},key,unb64(C.c));
+  return JSON.parse(new TextDecoder().decode(plano));
+}
+function fk(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+const DIAS=["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
+const DN=["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"];
+const MESES=["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+let fecha=new Date(), tab="hoy", diaSel=(new Date().getDay()+6)%7, semMin=0, diaMin=(new Date().getDay()+6)%7, busq="";
+function semActual(){
+  if(!PLAN||!PLAN.m) return 0;
+  if(S.ciclo&&S.ciclo.l){const q=S.ciclo.l.split("-").map(Number),i0=new Date(q[0],q[1]-1,q[2]),h0=new Date();h0.setHours(0,0,0,0);
+    const w=Math.floor(Math.round((h0-i0)/864e5)/7),n=PLAN.m.length;return ((S.ciclo.s+w)%n+n)%n}
+  if(!PLAN.mi) return 0;
+  const p=PLAN.mi.split("-").map(Number), ini=new Date(p[0],p[1]-1,p[2]), hoy=new Date();hoy.setHours(0,0,0,0);
+  const d=Math.round((hoy-ini)/864e5);
+  return d<0?0:Math.floor(d/7)%PLAN.m.length;
+}
+semMin=semActual();
+function initCiclo(){const I=CD()?cdInfo(new Date()):null;if(I){semMin=I.v;diaMin=I.dia;diaSel=I.dia}else if(CD()){diaMin=0;diaSel=0}}
+/* Turnos (opcional): mt = {clave:{t,s,h:[hora por comida en orden de d],o:[orden en que se viven],n:[nombre por comida]}}, mw = [clave por semana de m] */
+function turno(s){if(PLAN&&PLAN.cd)return null;const k=PLAN&&PLAN.mw&&PLAN.mw[s];return k&&PLAN.mt&&PLAN.mt[k]?PLAN.mt[k]:null}
+/* Ciclo de turnos por día (opcional, p. ej. cuarto turno 2 días + 2 noches + 4 libres):
+   cd = {k:[clave de mt por día del ciclo], n:[nombre de cada día]}; mt[clave] puede llevar p:[porciones por comida en el orden de d].
+   m = [vuelta][día del ciclo][comida]; sc = [sesión de entrenamiento por día del ciclo] (mismo formato que s).
+   La paciente marca una vez qué día del ciclo es hoy (se guarda en su celular). */
+const CD=()=>PLAN&&PLAN.cd;
+function cdInfo(d){const C=CD();if(!C||!S.cdi)return null;const L=C.k.length,q=S.cdi.split("-").map(Number),i0=new Date(q[0],q[1]-1,q[2]),x=new Date(d);x.setHours(0,0,0,0);
+  const t=Math.round((x-i0)/864e5),dia=((t%L)+L)%L,nv=PLAN.m?PLAN.m.length:1,v=((Math.floor(t/L)%nv)+nv)%nv;return{dia,v,T:PLAN.mt[C.k[dia]]}}
+const porcDe=(T,i)=>(T&&T.p&&T.p[i])||PLAN.d[i][2];
+function cdSel(){const C=CD();return `<div class="cdset">${C.n.map((n,i)=>`<button class="${esc(C.k[i])}" data-cdset="${i}">${esc(n)}</button>`).join("")}</div>`}
+const app=document.getElementById("app");
+const fr=n=>{n=Math.round(n*4)/4;const w=Math.floor(n),r=n-w,f={0:"",0.25:"¼",0.5:"½",0.75:"¾"}[r];return (w||!f?w:"")+f};
+const req=g=>+PLAN.p[g]||0;
+function totalReq(){return ORDEN.reduce((a,g)=>a+req(g),0)}
+function marcado(k){const d=S.dias[k]||{};return ORDEN.reduce((a,g)=>a+Math.min(d[g]||0,req(g)),0)}
+const SING={cereales:"cereal",proteinas:"proteína",frutas:"fruta",verduras:"verdura",lacteos:"lácteo",grasas:"grasa"};
+const chipsDe=p=>ORDEN.filter(g=>+p[g]).map(g=>`<span class="chip" style="--c:${GRUPOS[g].c};--k:${GRUPOS[g].k}">${fr(p[g])} ${+p[g]<=1?SING[g]:GRUPOS[g].nombre.toLowerCase()}</span>`).join("");
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+/* ===================== Minuta automática (14 días) ===================== */
+const A=(q,s,p,i)=>[q,s,p,i?1:0];
+const COLFR=[A(1,"manzana","manzanas",1),A(2,"kiwis","kiwis",1),A(1,"naranja","naranjas",1),A(.5,"plátano","plátanos"),A(15,"frutillas","frutillas",1),A(1,"taza de arándanos","tazas de arándanos"),A(1,"pera","peras",1),A(3,"mandarinas","mandarinas",1),A(1,"durazno","duraznos",1),A(1,"taza de sandía","tazas de sandía"),A(1,"taza de frambuesas","tazas de frambuesas"),A(15,"cerezas","cerezas",1)];
+const LAC=[A(1,"vaso de leche descremada","vasos de leche descremada"),A(1,"yogurt descremado","yogures descremados",1),A(1,"vaso de leche cultivada light","vasos de leche cultivada light"),A(.5,"Yogurt Protein","Yogurt Protein"),A(1,"yogurt natural","yogures naturales",1),A(2,"rebanadas de quesillo","rebanadas de quesillo",1)];
+const ALI={
+ des:{cereales:[A(.5,"marraqueta","marraquetas"),A(2,"rebanadas de pan integral","rebanadas de pan integral",1),A(.5,"taza de avena","tazas de avena"),A(.5,"hallulla","hallullas"),A(1,"tortilla M","tortillas M",1),A(.5,"taza de granola","tazas de granola"),A(1,"taza de cereal En Línea","tazas de cereal En Línea")],
+  proteinas:[A(1,"huevo revuelto","huevos revueltos",1),A(3,"claras de huevo","claras de huevo",1),A(1,"huevo duro","huevos duros",1),A(1,"huevo a la copa","huevos a la copa",1),A(.5,"lata de atún","latas de atún")],
+  lacteos:[A(1,"vaso de leche descremada (puede ir en café)","vasos de leche descremada"),A(2,"rebanadas de quesillo","rebanadas de quesillo",1),A(1,"yogurt descremado","yogures descremados",1),A(2,"rebanadas de queso fresco light","rebanadas de queso fresco light",1),A(1,"vaso de leche cultivada light","vasos de leche cultivada light")],
+  frutas:COLFR,grasas:[A(.5,"palta","paltas"),A(2,"cucharadita de mantequilla de maní","cucharaditas de mantequilla de maní",1),A(15,"almendras","almendras",1)],
+  verduras:[A(1,"tomate","tomates",1),A(1,"taza de tomate cherry","tazas de tomate cherry")]},
+ col:{frutas:COLFR,lacteos:LAC,
+  grasas:[A(15,"almendras","almendras",1),A(10,"nueces","nueces",1),A(30,"maníes","maníes",1),A(15,"pistachos","pistachos",1),A(12,"castañas de cajú","castañas de cajú",1),A(15,"avellanas","avellanas",1)],
+  cereales:[A(6,"galletas de arroz","galletas de arroz",1),A(.5,"taza de granola","tazas de granola"),A(1,"barra Mizos","barras Mizos",1),A(3,"taza de cabritas","tazas de cabritas")],
+  proteinas:[A(1,"huevo duro","huevos duros",1)],
+  verduras:[A(1,"taza de tomate cherry","tazas de tomate cherry"),A(.5,"taza de zanahoria en bastones","tazas de zanahoria en bastones")]},
+ alm:{cereales:[A(.75,"taza de arroz","tazas de arroz"),A(1,"papa cocida","papas cocidas",1),A(.75,"taza de pasta integral","tazas de pasta integral"),A(1,"taza de quínoa","tazas de quínoa"),A(1,"taza de choclo","tazas de choclo"),A(.5,"camote asado","camotes asados"),A(.75,"taza de arroz integral","tazas de arroz integral"),A(1,"taza de cous cous","tazas de cous cous")],
+  proteinas:[A(.5,"palma de pechuga de pollo a la plancha","palmas de pechuga de pollo a la plancha"),A(.5,"palma de salmón al horno","palmas de salmón al horno"),A(.5,"palma de reineta o merluza","palmas de reineta o merluza"),A(.5,"palma de tártaro 3 %","palmas de tártaro 3 %"),A(.5,"palma de lomo liso","palmas de lomo liso"),A(.5,"palma de carne molida de pavo","palmas de carne molida de pavo"),A(.5,"palma de trutro de pollo al horno","palmas de trutro de pollo al horno"),A(.5,"taza de camarones salteados","tazas de camarones salteados"),A(.5,"palma de posta","palmas de posta")],
+  verduras:[A(1,"tomate","tomates",1),A(1,"taza de brócoli","tazas de brócoli"),A(.5,"taza de zanahoria rallada","tazas de zanahoria rallada"),A(.5,"taza de betarraga","tazas de betarraga"),A(.5,"taza de porotos verdes","tazas de porotos verdes"),A(.5,"taza de zapallo","tazas de zapallo"),A(.75,"taza de coliflor","tazas de coliflor"),A(1,"taza de tomate cherry","tazas de tomate cherry"),A(5,"espárragos","espárragos",1),A(.5,"taza de champiñones salteados","tazas de champiñones salteados")],
+  grasas:[A(.5,"palta","paltas"),A(4,"cucharadita de aceite de oliva","cucharaditas de aceite de oliva",1),A(15,"aceitunas","aceitunas",1)],
+  lacteos:LAC,frutas:COLFR}
+};
+ALI.cen=Object.assign({},ALI.alm,{
+  cereales:[A(1,"tortilla M","tortillas M",1),A(2,"rebanadas de pan integral","rebanadas de pan integral",1),A(.75,"taza de arroz","tazas de arroz"),A(1.5,"pan pita","panes pita"),A(.5,"marraqueta","marraquetas"),A(1,"taza de quínoa","tazas de quínoa"),A(6,"galletas de arroz","galletas de arroz",1)],
+  proteinas:[A(1,"huevo (en omelette o revuelto)","huevos (en omelette o revueltos)",1),A(.5,"lata de atún","latas de atún"),A(.5,"palma de pollo desmenuzado","palmas de pollo desmenuzado"),A(.5,"palma de reineta a la plancha","palmas de reineta a la plancha"),A(.5,"taza de camarones","tazas de camarones"),A(.5,"palma de salmón","palmas de salmón")]});
+const OFF={cereales:0,proteinas:3,frutas:5,verduras:1,lacteos:2,grasas:4};
+function ctx(nombre){const n=nombre.toLowerCase();if(n.includes("desayuno"))return"des";if(n.includes("almuerzo"))return"alm";if(n.includes("cena")||n.includes("once"))return"cen";return"col"}
+function cant(it,n){let v=it[0]*n;let t=it[3]?String(Math.max(1,Math.round(v))):fr(v);return `${t} ${v>1?it[2]:it[1]}`}
+function plato(dia,j,comida,p){
+  const L=ALI[ctx(comida)], partes=[];
+  ORDEN.forEach((g,gi)=>{const n=+p[g]||0;if(!n)return;const lst=L[g]||ALI.alm[g];
+    const L2=lst.length, gcd=(a,b)=>b?gcd(b,a%b):a, step=[5,7,3,1].find(x=>gcd(x,L2)===1);
+    const base=(dia*step+j*2+OFF[g]+gi)%L2;
+    if((g==="verduras"||g==="frutas")&&n>1){let resto=n,k=0;while(resto>0){const u=Math.min(1,resto);partes.push(cant(lst[(base+k)%lst.length],u));resto-=u;k++}}
+    else partes.push(cant(lst[base],n));});
+  if(!partes.length) return "Libre: agua o infusión.";
+  let t=partes.length>1?partes.slice(0,-1).join(", ")+" y "+partes.at(-1):partes[0];
+  t=t.charAt(0).toUpperCase()+t.slice(1);
+  if(+p.verduras&&ctx(comida)!=="col") t+=". Verduras de consumo libre a gusto";
+  return t+".";
+}
+
+/* ===================== Vistas ===================== */
+function vistaCarga(error){
+  return `<div class="carga"><div><h1>Te damos la bienvenida a <em>Porciona</em></h1><p class="sub">Para empezar, pega aquí el código que te envié por WhatsApp.</p></div>
+  <ol class="pasos"><li>En WhatsApp, mantén apretado mi mensaje con el código y toca <b>Copiar</b>.</li><li>Vuelve aquí, mantén apretado el recuadro y toca <b>Pegar</b>.</li><li>Toca <b>Cargar mi plan</b>. Solo lo haces una vez.</li></ol>
+  <label class="lbl" for="codigo">Tu código</label>
+  <textarea id="codigo" placeholder="Empieza con RV1-…" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea>
+  <div class="err" id="err">${error||""}</div>
+  <button class="btn" id="cargar">Cargar mi plan</button>
+  <button class="link" id="demo">Ver un plan de ejemplo</button></div>`;
+}
+function vistaHoy(){
+  const k=fk(fecha), d=S.dias[k]||{}, hoy=fk(new Date())===k;
+  const tot=totalReq(), m=marcado(k), pct=tot?m/tot:0, C=2*Math.PI*30;
+  const msg=pct>=1?"¡Completaste tus porciones del día!":pct>=.5?"Vas muy bien, sigue así":"Marca cada porción cuando la comas";
+  let h=`<div class="dia"><button id="ant" aria-label="Día anterior">‹</button>
+  <div class="f"><span class="lbl">${hoy?"Hoy":DIAS[fecha.getDay()]}</span><b>${fecha.getDate()} de ${MESES[fecha.getMonth()]}</b></div>
+  <button id="sig" aria-label="Día siguiente" ${hoy?"disabled":""}>›</button></div>
+  <div class="resumen"><svg class="anillo" viewBox="0 0 74 74"><circle cx="37" cy="37" r="30" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="7"/>
+  <circle cx="37" cy="37" r="30" fill="none" stroke="#C2DC80" stroke-width="7" stroke-linecap="round" stroke-dasharray="${C*pct} ${C}" transform="rotate(-90 37 37)"/>
+  <text x="37" y="44" text-anchor="middle">${fr(m)}/${fr(tot)}</text></svg>
+  <div><small>Porciones del día</small><p>${msg}</p></div></div><div class="grupos">`;
+  ORDEN.forEach(g=>{
+    const r=req(g); if(!r) return;
+    const Gr=GRUPOS[g], v=d[g]||0, n=Math.ceil(r);
+    let dots="";
+    for(let i=0;i<n;i++){const half=(i===n-1&&r%1);dots+=`<button class="dot${half?" half":""}${i<v?" on":""}" style="--c:${Gr.c};--k:${Gr.k}" data-g="${g}" data-i="${i}" aria-label="${Gr.nombre} porción ${i+1}" aria-pressed="${i<v}"></button>`;}
+    h+=`<div class="g"><div class="g-top"><h3>${Gr.nombre}</h3><span class="${v>=n?"ok":""}">${fr(Math.min(v,r))} de ${fr(r)}</span></div>
+    <div class="dots">${dots}</div><div class="ejm">1 porción = ${Gr.ej}</div></div>`;
+  });
+  if(CD()){const I=cdInfo(fecha);
+    h+=`</div><div><h2>Cómo repartir <em>tu día</em></h2>`;
+    if(!I) return h+`<p class="sub">Para mostrarte tus horarios, cuéntame una sola vez: ¿qué día de tu turno es hoy?</p></div>${cdSel()}`;
+    const T=I.T, ord=T.o;
+    h+=`<p class="turnohoy"><span>Hoy: <b>${esc(PLAN.cd.n[I.dia])}</b> · ${esc(T.s)}</span><button class="link" data-cdreset="1">Cambiar</button></p><p class="sub">Puedes mover tus frutas, lácteos y grasas entre comidas, siempre que completes el total.</p></div><div class="caja comidas">`;
+    ord.forEach(i=>{h+=`<div class="cm"><span class="h">${T.h[i]}</span><div><h4>${esc(T.n[i])}</h4><div class="chips">${chipsDe(porcDe(T,i))}</div></div></div>`;});
+    return h+"</div>";}
+  const T=turno(semActual()), ord=T?T.o:PLAN.d.map((_,i)=>i);
+  h+=`</div><div><h2>Cómo repartir <em>tu día</em></h2><p class="sub">${T?`Esta semana: <b>${esc(T.t)}</b> · ${esc(T.s)}. `:""}Puedes mover porciones entre comidas, siempre que completes el total.</p></div><div class="caja comidas">`;
+  ord.forEach(i=>{const t=PLAN.d[i];h+=`<div class="cm"><span class="h">${T?T.h[i]:(t[1]||"")}</span><div><h4>${T?esc(T.n[i]):t[0]}</h4><div class="chips">${chipsDe(t[2])}</div></div></div>`;});
+  return h+"</div>";
+}
+function vistaMinutaCiclo(){
+  const C=CD(), M=PLAN.m, I=cdInfo(new Date()), hk=fk(new Date()), comi=(S.comi&&S.comi[hk])||{};
+  if(semMin>=M.length) semMin=0; if(diaMin>=C.k.length) diaMin=I?I.dia:0;
+  const T=PLAN.mt[C.k[diaMin]], esHoy=I&&I.v===semMin&&I.dia===diaMin;
+  let h=`<div><h1>Tu minuta <em>por turno</em></h1><p class="sub">Ideas para cada día de tu ciclo de turnos (${C.k.length} días). Son tus mismas porciones: solo cambian el orden y la hora. Puedes cambiar cualquier alimento por otro del mismo grupo.</p></div>`;
+  if(!I) h+=`<p class="tipm">Para marcar tu día de hoy, cuéntame una sola vez: ¿qué día de tu turno es hoy?</p>${cdSel()}`;
+  h+=`<div class="semsel">${M.map((_,v)=>`<button data-sem="${v}" class="${I&&v===I.v?"actual":""}" aria-pressed="${v===semMin}">Ciclo ${v+1}</button>`).join("")}</div>
+  <div class="dsel c8">${C.n.map((n,i)=>`<button data-dm="${i}" class="${I&&I.v===semMin&&i===I.dia?"hoy":""}" aria-pressed="${i===diaMin}">${esc(n)}</button>`).join("")}</div>
+  <p class="tipm"><b>${esc(T.t)}</b> · ${esc(T.s)}${I?(esHoy?". Es tu día de hoy.":""):""}</p>`;
+  T.o.forEach(i=>{const txt=esc(((M[semMin]||[])[diaMin]||[])[i]||"Libre: agua o infusión.");
+    h+=`<div class="mc"><div class="mc-top"><h3>${esc(T.n[i])}</h3><span>${T.h[i]}</span></div><p>${txt}</p><div class="chips">${chipsDe(porcDe(T,i))}</div>
+    ${esHoy?`<button class="comi${comi[i]?" on":""}" data-comi="${i}" aria-pressed="${!!comi[i]}">${comi[i]?"✓ Marcado en Hoy":"Lo comí: marcar en Hoy"}</button>`:""}</div>`;});
+  h+=`<p class="tipm">En tu día de hoy, el botón “Lo comí” suma esas porciones a tu registro de la pestaña Hoy.${PLAN.rec?" Las recetas que nombra tu minuta están aquí abajo.":""}</p>`;
+  if(PLAN.rec&&PLAN.rec.length) h+=`<div><h2>Tus <em>recetas</em></h2><p class="sub">Toca una receta para verla. Ya están ajustadas a tus porciones.</p></div><div class="recetas">`+
+      PLAN.rec.map(r=>`<details class="rct"><summary>${esc(r[0])}${r[1]?`<small>${esc(r[1])}</small>`:""}</summary><p>${esc(r[2])}</p></details>`).join("")+`</div>`;
+  return h;
+}
+function vistaMinuta(){
+  if(CD()&&PLAN.m) return vistaMinutaCiclo();
+  const M=PLAN.m, nS=M?M.length:2, actual=semActual();
+  const hoyIdx=(new Date().getDay()+6)%7, hk=fk(new Date()), comi=(S.comi&&S.comi[hk])||{};
+  const esSemHoy=M?semMin===actual:true, esHoy=esSemHoy&&diaMin===hoyIdx;
+  const T=M?turno(semMin):null, ord=T?T.o:PLAN.d.map((_,i)=>i);
+  let h=M&&PLAN.mw?`<div><h1>Tu minuta <em>por turno</em></h1><p class="sub">Una semana de ideas para cada semana de tu ciclo de turnos. Las porciones de cada comida son las mismas: solo cambia la hora. Puedes cambiar cualquier alimento por otro del mismo grupo.</p></div>`
+     :M?`<div><h1>Tu minuta <em>del mes</em></h1><p class="sub">Ideas para cada día que ya calzan con tus porciones. Puedes cambiar cualquier alimento por otro del mismo grupo.</p></div>`
+         :`<div><h1>Minuta <em>de ejemplo</em></h1><p class="sub">Dos semanas de ideas que ya calzan con tus porciones. Puedes cambiar cualquier alimento por otro del mismo grupo.</p></div>`;
+  h+=`<div class="semsel">${Array.from({length:nS},(_,s)=>`<button data-sem="${s}" class="${M&&s===actual?"actual":""}" aria-pressed="${s===semMin}">Semana ${s+1}${turno(s)?" · "+esc(turno(s).t.replace("Turno de ","")).replace(/^./,c=>c.toUpperCase()):""}</button>`).join("")}</div>
+  ${T?`<p class="tipm"><b>${esc(T.t)}</b> · ${esc(T.s)}. ${semMin===actual?"Es tu semana actual.":`<button class="link" data-ciclo="1">Esta es mi semana actual</button>`}</p>`:""}
+  <div class="dsel">${DN.map((n,i)=>`<button data-dm="${i}" class="${esSemHoy&&i===hoyIdx?"hoy":""}" aria-pressed="${i===diaMin}">${n}</button>`).join("")}</div>`;
+  ord.forEach(i=>{const t=PLAN.d[i];
+    const txt=M?esc(((M[semMin]||[])[diaMin]||[])[i]||"Libre: agua o infusión."):plato(semMin*7+diaMin,i,t[0],t[2]);
+    h+=`<div class="mc"><div class="mc-top"><h3>${T?esc(T.n[i]):t[0]}</h3><span>${T?T.h[i]:(t[1]||"")}</span></div><p>${txt}</p><div class="chips">${chipsDe(t[2])}</div>
+    ${esHoy?`<button class="comi${comi[i]?" on":""}" data-comi="${i}" aria-pressed="${!!comi[i]}">${comi[i]?"✓ Marcado en Hoy":"Lo comí: marcar en Hoy"}</button>`:""}</div>`;
+  });
+  h+=`<p class="tipm">En el día de hoy, el botón “Lo comí” suma esas porciones a tu registro de la pestaña Hoy.${M&&PLAN.rec?" Las recetas que nombra tu minuta están aquí abajo.":""}</p>`;
+  if(M&&PLAN.rec&&PLAN.rec.length){
+    h+=`<div><h2>Tus <em>recetas</em></h2><p class="sub">Toca una receta para verla. Ya están ajustadas a tus porciones.</p></div><div class="recetas">`+
+      PLAN.rec.map(r=>`<details class="rct"><summary>${esc(r[0])}${r[1]?`<small>${esc(r[1])}</small>`:""}</summary><p>${esc(r[2])}</p></details>`).join("")+`</div>`;
+  }
+  return h;
+}
+function lunesDe(d){const x=new Date(d);x.setDate(x.getDate()-((x.getDay()+6)%7));return x}
+const sesion=s=>s&&(s[0]==="f"||s[0]==="c");
+function vistaEntreno(){
+  if(CD()&&PLAN.sc) return vistaEntrenoCiclo();
+  const sem=PLAN.s||[], lun=lunesDe(new Date());
+  if(!sem.some(sesion)) return `<div><h1>Tu <em>entrenamiento</em></h1><p class="sub">Todavía no tienes un plan de entrenamiento cargado. Lo vemos en tu próximo control.</p></div>`;
+  let h=`<div><h1>Tu semana <em>de entrenamiento</em></h1><p class="sub">Toca un día para ver qué te toca.</p></div><div class="semana">`;
+  sem.forEach((s,i)=>{
+    const d=new Date(lun);d.setDate(lun.getDate()+i);const hecho=S.entreno[fk(d)];
+    const cls=s[0]==="f"?"fuerza":s[0]==="c"?"cardio":"descanso", tit=s[0]==="f"?s[1]:s[0]==="c"?(ETQ[s[1]]||"Cardio"):"Libre";
+    h+=`<button class="sd ${cls}${i===diaSel?" sel":""}" data-sd="${i}"><span>${DN[i]}</span><b>${tit}</b>${sesion(s)?`<i class="${hecho?"hecho":""}"></i>`:""}</button>`;
+  });
+  h+="</div>";
+  const s=sem[diaSel]||["d"], d=new Date(lun);d.setDate(lun.getDate()+diaSel);const k=fk(d), hecho=S.entreno[k];
+  if(s[0]==="f"&&PLAN.r&&PLAN.r[s[1]]){
+    const R=PLAN.r[s[1]], ex=S.entreno[k+"-ex"]||[];
+    h+=`<div class="dia-h"><span class="letra">${s[1]}</span><div><span class="lbl">Día ${s[1]}</span><h2>${R[0]||"Fuerza"}</h2><span class="sub">${R[1]||""}</span></div></div><div class="caja" style="padding-block:4px">`;
+    R[2].forEach((x,i)=>{const pk=s[1]+"-"+i;
+      h+=`<div class="ex"><button class="chk${ex[i]?" on":""}" data-ex="${i}" data-k="${k}" aria-label="Marcar ${x[0]}" aria-pressed="${!!ex[i]}"></button>
+      <div><b>${x[0]}</b>${x[4]?`<small>${x[4]}</small>`:""}<div class="pres">${x[1]?`<span>${x[1]} series</span>`:""}${x[2]?`<span>${x[2]} reps</span>`:""}${x[3]?`<span>pausa ${x[3]}</span>`:""}
+      <label for="p-${pk}">Peso <input id="p-${pk}" inputmode="decimal" data-p="${pk}" value="${S.pesos[pk]||""}" placeholder="kg"></label></div></div></div>`;});
+    h+=`</div>`;
+  }else if(s[0]==="c"){
+    const c=CARDIO[s[1]]||CARDIO.moderado, m=+s[2]||30;
+    h+=`<div class="cardio-c ${c.cls}"><span class="lbl" style="color:inherit">${m} min</span><h2 style="color:inherit">${c.t}</h2><p style="margin:0">${c.txt}</p><ol>${c.it(m).map(i=>`<li>${i}</li>`).join("")}</ol></div>`;
+  }else{
+    h+=`<div class="caja"><h2>Día <em>libre</em></h2><p class="sub">Descansar también es parte del plan. Una caminata suave suma.</p></div>`;
+  }
+  if(sesion(s)) h+=`<button class="btn${hecho?" hecho":""}" id="fin" data-k="${k}">${hecho?"✓ Sesión completada":"Marcar sesión como completada"}</button>`;
+  return h;
+}
+function vistaProgreso(){
+  const tot=totalReq(); let barras="", suma=0, dias=0;
+  for(let i=6;i>=0;i--){
+    const d=new Date();d.setDate(d.getDate()-i);const k=fk(d), p=tot?marcado(k)/tot:0;
+    if(S.dias[k]){suma+=p;dias++}
+    barras+=`<div class="bc"><em>${Math.round(p*100)}%</em><div class="b${i===0?" hoy":""}" style="height:${Math.max(p*100,2)}%"></div><span>${DIAS[d.getDay()].slice(0,2)}</span></div>`;
+  }
+  const lun=lunesDe(new Date()); let ses=0, plan=0;
+  (PLAN.s||[]).forEach((s,i)=>{if(!sesion(s))return;plan++;const d=new Date(lun);d.setDate(lun.getDate()+i);if(S.entreno[fk(d)])ses++;});
+  const falta={};ORDEN.forEach(g=>falta[g]=0);
+  for(let i=0;i<7;i++){const d=new Date();d.setDate(d.getDate()-i);const v=S.dias[fk(d)];if(!v)continue;ORDEN.forEach(g=>falta[g]+=Math.max(0,req(g)-(v[g]||0)));}
+  const peor=ORDEN.slice().sort((a,b)=>falta[b]-falta[a])[0];
+  return `<div><h1>Mi <em>semana</em></h1><p class="sub">Últimos 7 días. Muéstrale este resumen a Romina en tu control.</p></div>
+  <div class="resumen"><div><small>Porciones cumplidas</small><p>${dias?Math.round(suma/dias*100):0}% en promedio</p></div>${plan?`<div><small>Entrenamientos</small><p>${ses} de ${plan} esta semana</p></div>`:""}</div>
+  <div class="caja"><div class="barras">${barras}</div></div>
+  ${falta[peor]>0&&dias?`<div class="caja"><span class="lbl">El grupo que más te cuesta</span><h2>${GRUPOS[peor].nombre}</h2><p class="sub">Te faltaron ${fr(falta[peor])} porciones estos días. Prueba sumarlas en una colación.</p></div>`:""}`;
+}
+function vistaGuia(){
+  return `<div><h1>Guía de <em>porciones</em></h1><p class="sub">Cada fila equivale a 1 porción. Dentro del grupo puedes intercambiar. Pesos de carnes y pescados en cocido.</p></div>
+  <input class="buscar" id="buscar" placeholder="Busca un alimento: palta, arroz…" value="${busq.replace(/"/g,"&quot;")}" aria-label="Buscar alimento"><div id="lista">${listaGuia()}</div>`;
+}
+const norm=s=>s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+function listaGuia(){
+  const q=norm(busq.trim()); let h="";
+  ORDEN.forEach(g=>{
+    const rows=GUIA[g].filter(r=>!q||norm(r[0]).includes(q)); if(!rows.length)return;
+    h+=`<div class="gt" style="--c:${GRUPOS[g].c}"><i></i><b>${GRUPOS[g].nombre}</b></div>`+rows.map(r=>`<div class="al"><span>${r[0]}</span><span>${r[1]}</span></div>`).join("");
+  });
+  return h||`<p class="sub">No está en la lista. Anótalo y lo vemos en tu próximo control.</p>`;
+}
+
+/* ===================== Render y eventos ===================== */
+let errCarga="";
+function vistaClave(error){
+  return `<form class="carga" id="fClave" autocomplete="off"><div>${PLAN_CIFRADO.n?`<h1>Hola, <em>${esc(PLAN_CIFRADO.n)}</em></h1><p class="sub">Este es tu plan en Porciona: tus porciones, tu minuta y tu entrenamiento. Para abrirlo, escribe la clave que te di.</p>`:`<h1>Tu plan en <em>Porciona</em></h1><p class="sub">Tu plan de porciones, minuta y entrenamiento. Para abrirlo, escribe la clave que te di.</p>`}</div>
+  <label class="lbl" for="clave">Tu clave</label>
+  <input class="buscar" id="clave" type="text" placeholder="Ej: frutilla-mango-4827" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off">
+  <div class="err" id="err">${error||""}</div>
+  <button class="btn" id="abrir" type="submit">Abrir mi plan</button>
+  <p class="sub">Solo la escribes una vez: tu celular la recuerda.</p></form>`;
+}
+async function intentarClave(clave,silencioso){
+  try{PLAN=await abrirPlan(clave);try{localStorage.setItem(NS+"clave",clave)}catch(e){}errCarga="";tab="hoy";semMin=semActual();render();return true}
+  catch(e){if(!silencioso){errCarga=window.crypto&&crypto.subtle?"Esa clave no es correcta. Revísala, sin espacios, tal como te la envié.":"Tu navegador no puede abrir el plan. Ábrelo en Chrome o Safari actualizado.";render();const c=document.getElementById("clave");if(c)c.value=clave}return false}
+}
+let cicloIni=false;
+function render(){
+  const nav=document.getElementById("nav");
+  if(PLAN&&CD()&&!cicloIni){cicloIni=true;initCiclo();}
+  if(!PLAN&&PLAN_CIFRADO){nav.hidden=true;document.getElementById("hola").textContent="";app.innerHTML=vistaClave(errCarga);return}
+  if(!PLAN){nav.hidden=true;document.getElementById("hola").textContent="";app.innerHTML=vistaCarga(errCarga);return}
+  nav.hidden=false;
+  document.getElementById("hola").textContent=PLAN.n?`Hola, ${PLAN.n}`:"";
+  app.innerHTML=`<div class="col">${{hoy:vistaHoy,minuta:vistaMinuta,entreno:vistaEntreno,progreso:vistaProgreso,guia:vistaGuia}[tab]()}</div>`;
+  nav.querySelectorAll("button").forEach(b=>b.setAttribute("aria-selected",b.dataset.t===tab));
+}
+async function cargarCodigo(){
+  const t=document.getElementById("codigo").value;
+  try{PLAN=await decodificar(t);errCarga="";tab="hoy";semMin=semActual();guardar();render();window.scrollTo(0,0)}
+  catch(e){errCarga=e.message==="navegador"?"Tu navegador no puede abrir el código. Abre este link en Chrome o Safari actualizado.":"No reconozco ese código. Cópialo completo desde WhatsApp: empieza con RV1-.";
+    const v=t;render();document.getElementById("codigo").value=v;}
+}
+app.addEventListener("click",e=>{
+  const t=e.target.closest("button"); if(!t)return;
+  if(t.id==="cargar"){cargarCodigo();return}
+  if(t.id==="demo"){PLAN=JSON.parse(JSON.stringify(DEMO));errCarga="";tab="hoy";semMin=0;guardar();render();return}
+  if(t.id==="cambiar"){tab="carga";render();return}
+  if(t.id==="ant"){fecha.setDate(fecha.getDate()-1);render();}
+  else if(t.id==="sig"){fecha.setDate(fecha.getDate()+1);render();}
+  else if(t.dataset.g){const k=fk(fecha),g=t.dataset.g,i=+t.dataset.i;S.dias[k]=S.dias[k]||{};const v=S.dias[k][g]||0;S.dias[k][g]=(i<v)?i:i+1;guardar();render();}
+  else if(t.dataset.sd){diaSel=+t.dataset.sd;render();}
+  else if(t.dataset.cdset){const x=new Date();x.setHours(0,0,0,0);x.setDate(x.getDate()-(+t.dataset.cdset));S.cdi=fk(x);const I=cdInfo(new Date());semMin=I.v;diaMin=I.dia;diaSel=I.dia;guardar();render();}
+  else if(t.dataset.cdreset){delete S.cdi;guardar();render();}
+  else if(t.dataset.ciclo){S.ciclo={l:fk(lunesDe(new Date())),s:semMin};guardar();render();}
+  else if(t.dataset.sem){semMin=+t.dataset.sem;render();}
+  else if(t.dataset.dm){diaMin=+t.dataset.dm;render();}
+  else if(t.dataset.comi){const k=fk(new Date()),i=+t.dataset.comi;S.comi=S.comi||{};S.comi[k]=S.comi[k]||{};S.dias[k]=S.dias[k]||{};
+    const I=CD()?cdInfo(new Date()):null, on=!S.comi[k][i], p=I?porcDe(I.T,i):PLAN.d[i][2];
+    ORDEN.forEach(g=>{if(+p[g]){const v=(S.dias[k][g]||0)+(on?+p[g]:-p[g]);S.dias[k][g]=Math.max(0,Math.min(Math.ceil(req(g)),Math.ceil(v)))}});
+    S.comi[k][i]=on;guardar();render();}
+  else if(t.dataset.ex){const k=t.dataset.k+"-ex";S.entreno[k]=S.entreno[k]||[];S.entreno[k][+t.dataset.ex]=!S.entreno[k][+t.dataset.ex];guardar();render();}
+  else if(t.id==="fin"){S.entreno[t.dataset.k]=!S.entreno[t.dataset.k];guardar();render();}
+});
+app.addEventListener("input",e=>{
+  if(e.target.id==="buscar"){busq=e.target.value;document.getElementById("lista").innerHTML=listaGuia();}
+  else if(e.target.dataset.p){S.pesos[e.target.dataset.p]=e.target.value;guardar();}
+});
+document.getElementById("nav").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;tab=b.dataset.t;render();window.scrollTo(0,0);});
+app.addEventListener("submit",e=>{if(e.target.id!=="fClave")return;e.preventDefault();intentarClave(document.getElementById("clave").value,false)});
+(async()=>{
+  if(PLAN_CIFRADO&&!PLAN){let c=null;try{c=localStorage.getItem(NS+"clave")}catch(e){}
+    if(c&&await intentarClave(c,true))return;}
+  render();
+})();
+</script>
+</body>
+</html>
